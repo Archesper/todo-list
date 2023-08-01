@@ -1,2 +1,2 @@
-import './style.css'
 import 'reset-css'
+import './style.css'
