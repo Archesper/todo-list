@@ -24,6 +24,9 @@ class Todo {
   get description() {
     return this._description;
   }
+  get priority() {
+    return this._priority
+  }
   set title(value) {
     if (value.length > 75) {
       throw new RangeError("Todo title max 75 characters.");
@@ -32,6 +35,9 @@ class Todo {
   }
   set description(value) {
     this._description = value;
+  }
+  set priority(value) {
+    this._priority = Todo.PRIORITY_CONST[value];
   }
   append_task(task) {
     if (!(task instanceof Task)) {
