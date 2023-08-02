@@ -26,7 +26,7 @@ class Todo {
   }
   set title(value) {
     if (value.length > 75) {
-      throw new RangeError("Todo tite max 75 characters.");
+      throw new RangeError("Todo title max 75 characters.");
     }
     this._title = value;
   }
