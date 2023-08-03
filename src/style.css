@@ -110,6 +110,24 @@ main h1 {
   background-color: rgb(220, 220, 220);
 }
 
+.low {
+  background-color: rgb(109, 221, 109);
+}
+
+.medium {
+  background-color: #fdff76;
+}
+
+.high {
+  background-color: #ff7c7a;
+}
+
+.urgent {
+  color: white;
+  background-color: rgb(255, 0, 0);
+}
+
+
 
 
 
