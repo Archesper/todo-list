@@ -30,36 +30,32 @@ class DOMController {
     header.textContent = project.name;
     this.main.appendChild(header);
     // Add grid of todos
-    const table = document.createElement("table");
-    table.classList.add("todo_table");
+    const grid = document.createElement("div");
+    grid.classList.add("todo_grid");
     const header_text = ["Title", "Description", "Due date", "Priority"];
-    const header_row = document.createElement("tr");
     const headers = header_text.map((text) => {
-      const header = document.createElement("th");
+      const header = document.createElement("div");
       header.textContent = text;
+      header.classList.add("grid_header")
       console.log(header);
       return header;
     });
-    console.log(headers);
-    header_row.append(...headers);
-    table.appendChild(header_row);
+    grid.append(...headers);
     project.todos.forEach((todo) => {
-      const row = document.createElement("tr");
-      row.classList.add(todo.priority.toLowerCase());
       const contents = [
         todo.title,
         todo.description,
         todo.dueDate,
         todo.priority,
       ];
-      contents.forEach((content) => {
-        const node = document.createElement("td");
+      const content_cells = contents.map((content) => {
+        const node = document.createElement("div");
+        node.classList.add(todo.priority.toLowerCase());
         node.textContent = content;
-        
-        row.append(node)
+        return node;
       });
-      table.append(row);
+      grid.append(...content_cells)
     });
-    this.main.append(table);
+    this.main.append(grid);
   }
 }
