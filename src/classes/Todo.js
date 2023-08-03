@@ -37,7 +37,7 @@ class Todo {
     this._description = value;
   }
   set priority(value) {
-    this._priority = PRIORITY_CONST[value];
+    this._priority = this.constructor.PRIORITY_CONST()[value];
   }
   append_task(task) {
     if (!(task instanceof Task)) {
