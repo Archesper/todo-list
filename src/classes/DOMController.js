@@ -8,9 +8,11 @@ class DOMController {
   }
   init_display() {
     const project_list = document.createElement("ul");
-    this.projects.forEach((project) => {
+    this.projects.forEach((project, id) => {
       const project_tab = document.createElement("li");
       project_tab.textContent = project.name;
+      project_tab.dataset.id = id;
+      project_tab.addEventListener('click', this.eventListeners().project_tab)
       project_list.appendChild(project_tab);
     });
     this.nav.prepend(project_list);
@@ -57,4 +59,17 @@ class DOMController {
     });
     return grid;
   }
+  eventListeners()  {
+    const project_tab = (event) => {
+      const current_project = this.nav.querySelector(".active_project");
+      current_project.classList.remove("active_project");
+      const new_active_project = event.target;
+      new_active_project.classList.add("active_project");
+      this.switch_project(this.projects[new_active_project.dataset.id]);
+    }
+    return {project_tab}
+  }
 }
+
+
+
