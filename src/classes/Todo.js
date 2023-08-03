@@ -11,12 +11,12 @@ class Todo {
       URGENT: "Urgent",
     };
   }
-  constructor(title, description, priority) {
+  constructor(title, description, priority, dueDate = new Date) {
     this.title = title;
     this.description = description;
     this.priority = priority;
     this.tasks = [];
-    this.dueDate = Date.now();
+    this.dueDate = dueDate;
   }
   get title() {
     return this._title;
@@ -33,6 +33,9 @@ class Todo {
     }
     this._title = value;
   }
+  get dueDate() {
+    return `${this._dueDate.getMonth()}/${this._dueDate.getDate()}/${this._dueDate.getFullYear()}`;
+  }
   set description(value) {
     this._description = value;
   }
@@ -44,5 +47,8 @@ class Todo {
       throw new TypeError(`Object ${task} is not an instance of Task`);
     }
     this.tasks.push(task);
+  }
+  set dueDate(value) {
+    this._dueDate = value;
   }
 }
