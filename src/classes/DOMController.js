@@ -1,4 +1,5 @@
 export default DOMController;
+import Project from "./Project";
 
 class DOMController {
   constructor(projects = []) {
@@ -7,14 +8,27 @@ class DOMController {
     this.main = document.querySelector("main");
   }
   init_display() {
+    // Add add project button event listener
+    const add_btn = this.nav.querySelector("button");
+    console.log(add_btn);
+    add_btn.addEventListener("click", this.eventListeners().new_project);
+    // Make project tabs
     const project_list = document.createElement("ul");
     this.nav.prepend(project_list);
     this.projects.forEach((project, id) => this.add_project(project, id));
-    const current_project = project_list.firstChild;
-    current_project.classList.add("active_project");
+    // Display first project contents
     this.switch_project(this.projects[0]);
   }
   switch_project(project) {
+    // Switch highlighted project in navbar
+    const current_project = this.nav.querySelector(".active_project");
+    console.log(current_project);
+    if (current_project) {
+      current_project.classList.remove("active_project");
+    }
+    const id = this.projects.indexOf(project);
+    const new_active_project = this.nav.querySelector(`[data-id="${id}"]`);
+    new_active_project.classList.add("active_project");
     // Clear main contents
     this.main.textContent = "";
     // Add header to main
@@ -30,7 +44,7 @@ class DOMController {
     const project_tab = document.createElement("li");
     project_tab.textContent = project.name;
     project_tab.dataset.id = id;
-    project_tab.addEventListener('click', this.eventListeners().project_tab)
+    project_tab.addEventListener("click", this.eventListeners().project_tab);
     project_list.appendChild(project_tab);
   }
   todos_grid(project) {
@@ -61,17 +75,18 @@ class DOMController {
     });
     return grid;
   }
-  eventListeners()  {
+  eventListeners() {
     const project_tab = (event) => {
-      const current_project = this.nav.querySelector(".active_project");
-      current_project.classList.remove("active_project");
       const new_active_project = event.target;
-      new_active_project.classList.add("active_project");
       this.switch_project(this.projects[new_active_project.dataset.id]);
-    }
-    return {project_tab}
+    };
+    const new_project = (event) => {
+      const id = this.projects.length;
+      const project = new Project(`Project ${id + 1}`);
+      this.projects.push(project);
+      this.add_project(project, id);
+      this.switch_project(project);
+    };
+    return { project_tab, new_project };
   }
 }
-
-
-
