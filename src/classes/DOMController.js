@@ -8,14 +8,8 @@ class DOMController {
   }
   init_display() {
     const project_list = document.createElement("ul");
-    this.projects.forEach((project, id) => {
-      const project_tab = document.createElement("li");
-      project_tab.textContent = project.name;
-      project_tab.dataset.id = id;
-      project_tab.addEventListener('click', this.eventListeners().project_tab)
-      project_list.appendChild(project_tab);
-    });
     this.nav.prepend(project_list);
+    this.projects.forEach((project, id) => this.add_project(project, id));
     const current_project = project_list.firstChild;
     current_project.classList.add("active_project");
     this.switch_project(this.projects[0]);
@@ -30,6 +24,14 @@ class DOMController {
     // Add grid of todos
     const grid = this.todos_grid(project);
     this.main.append(grid);
+  }
+  add_project(project, id) {
+    const project_list = this.nav.querySelector("ul");
+    const project_tab = document.createElement("li");
+    project_tab.textContent = project.name;
+    project_tab.dataset.id = id;
+    project_tab.addEventListener('click', this.eventListeners().project_tab)
+    project_list.appendChild(project_tab);
   }
   todos_grid(project) {
     const grid = document.createElement("div");
