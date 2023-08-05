@@ -1,16 +1,21 @@
 :root {
   --grid-width: 95%;
+  --header-size: 1.7rem;
+  --header-padding: 4px;
+  --primary-color: rgb(248, 244, 244);
 }
 
 * {
   box-sizing: border-box;
 }
 
-button, input {
+button,
+input {
   font: inherit;
 }
 
-html, body {
+html,
+body {
   height: 100%;
 }
 
@@ -21,12 +26,14 @@ html {
 body {
   font-family: "Lato", sans-serif;
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: minmax(auto, 200px) 4fr;
+  background-color: var(--primary-color);
 }
 
 /* NAV STYLES */
 
 nav {
+  background-color: white;
   z-index: 100;
   position: relative;
   box-shadow: 0px 2px 12px 1px rgba(159, 144, 144, 0.76);
@@ -41,7 +48,7 @@ nav h1 {
   font-size: 2rem;
   font-weight: bold;
   font-style: italic;
-  padding: 4px;
+  padding: var(--header-padding);
 }
 
 nav button {
@@ -63,14 +70,24 @@ nav button:hover {
   align-items: center;
   gap: 8px;
 }
+
+/* Set width to enable overflow */
+#projects :is(ul, li),
+#projects {
+  width: 100%;
+}
+
 #projects li {
   margin-top: 2px;
-  color:rgb(174, 165, 165);
+  color: rgb(174, 165, 165);
   font-size: 14px;
   cursor: pointer;
-  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-#projects .active_project, #projects li:hover {
+#projects .active_project,
+#projects li:hover {
   color: black;
   font-size: inherit;
 }
@@ -79,8 +96,12 @@ nav button:hover {
 main {
   z-index: 10;
   position: relative;
-  background-color: rgb(248, 244, 244);
   padding: 12px;
+}
+
+.icon_wrapper {
+  display: flex;
+  align-items: center;
 }
 
 main h2 {
@@ -88,10 +109,25 @@ main h2 {
   background-color: inherit;
   margin-top: 0.7rem;
   /* Line up project title with todo grid */
-  margin-left: calc((100% - var(--grid-width))/2);
-  font-size: 1.7rem;
+  margin-left: calc((100% - var(--grid-width)) / 2 - var(--header-padding));
+  font-size: var(--header-size);
   border: none;
-  padding: 2px;
+  border: 1px solid var(--primary-color);
+  padding: var(--header-padding);
+}
+
+main h2:focus {
+  border: 1px solid black;
+  border-radius: 4px;
+  outline: none;
+}
+
+.icon_wrapper img {
+  cursor: pointer;
+  width: 18px;
+  margin: 0 6px;
+  margin-top: calc(var(--header-size) * 0.2);
+  opacity: 0.7;
 }
 
 .todo_grid {
@@ -135,9 +171,3 @@ main h2 {
   color: white;
   background-color: rgb(255, 0, 0);
 }
-
-
-
-
-
-

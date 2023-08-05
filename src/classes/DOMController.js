@@ -1,5 +1,7 @@
 export default DOMController;
 import Project from "./Project";
+import edit_outline from "../assets/edit_outline.svg";
+import edit_filled from "../assets/edit_filled.svg";
 
 class DOMController {
   constructor(projects = []) {
@@ -32,9 +34,15 @@ class DOMController {
     // Clear main contents
     this.main.textContent = "";
     // Add header to main
+    const icon_wrapper = document.createElement("div");
+    icon_wrapper.classList.add("icon_wrapper");
     const header = document.createElement("h2");
     header.textContent = project.name;
-    this.main.appendChild(header);
+    header.addEventListener("keydown", this.eventListeners().header_force_submit);
+    header.addEventListener("blur", this.eventListeners().finish_edit);
+    const edit_icon = this.edit_component();
+    icon_wrapper.append(header, edit_icon);
+    this.main.appendChild(icon_wrapper);
     // Add grid of todos
     const grid = this.todos_grid(project);
     this.main.append(grid);
@@ -75,6 +83,14 @@ class DOMController {
     });
     return grid;
   }
+  edit_component() {
+    const edit_icon = new Image();
+    edit_icon.src = edit_outline;
+    edit_icon.addEventListener("mouseover", this.eventListeners().icon_hover);
+    edit_icon.addEventListener("mouseout", this.eventListeners().icon_unhover);
+    edit_icon.addEventListener("click", this.eventListeners().begin_edit);
+    return edit_icon;
+  }
   eventListeners() {
     const project_tab = (event) => {
       const new_active_project = event.target;
@@ -87,6 +103,42 @@ class DOMController {
       this.add_project(project, id);
       this.switch_project(project);
     };
-    return { project_tab, new_project };
+    const icon_hover = (event) => {
+      event.target.src = edit_filled;
+    };
+    const icon_unhover = (event) => {
+      event.target.src = edit_outline;
+    };
+    const begin_edit = (event) => {
+      const active_project_header = this.main.querySelector("h2");
+      active_project_header.contentEditable = "true";
+      active_project_header.focus();
+      active_project_header.ariaSelected = "true";
+    };
+    const finish_edit = (event) => {
+      const active_project_tab = this.nav.querySelector(".active_project");
+      const newName = event.target.textContent;
+      active_project_tab.textContent = newName;
+      const id = active_project_tab.dataset.id;
+      this.projects[id].name = newName;
+      console.log(this.projects);
+    };
+    // This listener prevents a new line from being added when enter is pressed
+    // and instead makes the header lose focus
+    const header_force_submit = (event) => {
+      if (event.keyCode == 13) {
+        event.preventDefault();
+        event.target.blur();
+      }
+    };
+    return {
+      project_tab,
+      new_project,
+      icon_hover,
+      icon_unhover,
+      begin_edit,
+      finish_edit,
+      header_force_submit,
+    };
   }
 }
