@@ -2,6 +2,8 @@
   --grid-width: 95%;
   --header-size: 1.7rem;
   --header-padding: 4px;
+  --header-border-size: 1px;
+  --button-padding: 4px;
   --primary-color: rgb(248, 244, 244);
 }
 
@@ -30,6 +32,19 @@ body {
   background-color: var(--primary-color);
 }
 
+button {
+  font-size: 12px;
+  font-weight: bold;
+  border: none;
+  padding: 4px;
+  border-radius: 8px;
+}
+
+button:hover {
+  cursor: pointer;
+  background-color: rgb(225, 219, 219);
+}
+
 /* NAV STYLES */
 
 nav {
@@ -49,18 +64,6 @@ nav h1 {
   font-weight: bold;
   font-style: italic;
   padding: var(--header-padding);
-}
-
-nav button {
-  font-size: 12px;
-  font-weight: bold;
-  border: none;
-  padding: 4px;
-  border-radius: 8px;
-}
-nav button:hover {
-  cursor: pointer;
-  background-color: rgb(225, 219, 219);
 }
 
 #projects {
@@ -110,10 +113,10 @@ main h2 {
   background-color: inherit;
   margin-top: 0.7rem;
   /* Line up project title with todo grid */
-  margin-left: calc((100% - var(--grid-width)) / 2 - var(--header-padding));
+  margin-left: calc((100% - var(--grid-width)) / 2 - var(--header-border-size) - var(--header-padding));
   font-size: var(--header-size);
   border: none;
-  border: 1px solid var(--primary-color);
+  border: var(--header-border-size) solid var(--primary-color);
   padding: var(--header-padding);
   word-wrap: break-word;
   white-space: normal;
@@ -123,6 +126,12 @@ main h2:focus {
   border: 1px solid black;
   border-radius: 4px;
   outline: none;
+}
+
+main button {
+  margin-left: calc((100% - var(--grid-width))/2);
+  margin-top: 0.2rem;
+  border-radius: 0px;
 }
 
 .icon_wrapper img {
@@ -136,7 +145,7 @@ main h2:focus {
 .todo_grid {
   display: grid;
   grid-template-columns: 1fr 2fr repeat(2, 1fr);
-  margin: 2.5rem auto;
+  margin: 2rem auto;
   width: var(--grid-width);
   text-align: center;
 }
