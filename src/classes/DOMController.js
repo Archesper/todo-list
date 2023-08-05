@@ -113,15 +113,21 @@ class DOMController {
       const active_project_header = this.main.querySelector("h2");
       active_project_header.contentEditable = "true";
       active_project_header.focus();
-      active_project_header.ariaSelected = "true";
     };
     const finish_edit = (event) => {
       const active_project_tab = this.nav.querySelector(".active_project");
       const newName = event.target.textContent;
-      active_project_tab.textContent = newName;
       const id = active_project_tab.dataset.id;
-      this.projects[id].name = newName;
-      console.log(this.projects);
+      try {
+        this.projects[id].name = newName;
+        active_project_tab.textContent = newName;
+      } catch (error) {
+        alert("Project titles cannot exceed 75 characters");
+        event.target.textContent = this.projects[id].name;
+      }
+      finally {
+        event.target.contentEditable = "false";
+      }
     };
     // This listener prevents a new line from being added when enter is pressed
     // and instead makes the header lose focus

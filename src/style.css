@@ -105,6 +105,7 @@ main {
 }
 
 main h2 {
+  /* MAKE LESS UGLY WITH LARGE INPUTS */
   width: fit-content;
   background-color: inherit;
   margin-top: 0.7rem;
@@ -114,6 +115,8 @@ main h2 {
   border: none;
   border: 1px solid var(--primary-color);
   padding: var(--header-padding);
+  word-wrap: break-word;
+  white-space: normal;
 }
 
 main h2:focus {
