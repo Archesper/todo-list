@@ -1,8 +1,12 @@
+:root {
+  --grid-width: 95%;
+}
+
 * {
   box-sizing: border-box;
 }
 
-button {
+button, input {
   font: inherit;
 }
 
@@ -79,17 +83,22 @@ main {
   padding: 12px;
 }
 
-main h1 {
+main h2 {
+  width: fit-content;
+  background-color: inherit;
   margin-top: 0.7rem;
-  margin-left: 0.5rem;
+  /* Line up project title with todo grid */
+  margin-left: calc((100% - var(--grid-width))/2);
   font-size: 1.7rem;
+  border: none;
+  padding: 2px;
 }
 
 .todo_grid {
   display: grid;
   grid-template-columns: 1fr 2fr repeat(2, 1fr);
   margin: 2.5rem auto;
-  width: 90%;
+  width: var(--grid-width);
   text-align: center;
 }
 

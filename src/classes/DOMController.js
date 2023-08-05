@@ -32,7 +32,7 @@ class DOMController {
     // Clear main contents
     this.main.textContent = "";
     // Add header to main
-    const header = document.createElement("h1");
+    const header = document.createElement("h2");
     header.textContent = project.name;
     this.main.appendChild(header);
     // Add grid of todos
