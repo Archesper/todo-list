@@ -150,13 +150,22 @@ main button {
 
 .todo_grid {
   display: grid;
-  grid-template-columns: 1fr 2fr repeat(2, 1fr);
   margin: 2rem auto;
   width: var(--grid-width);
   text-align: center;
 }
 
-.todo_grid div {
+.grid_row {
+  display: grid;
+  grid-template-columns: 1fr 2fr repeat(2, 1fr);
+}
+
+.grid_row:hover:not(:first-child) {
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.grid_row div {
   padding: 8px;
   align-items: center;
   white-space: nowrap;

@@ -67,16 +67,17 @@ class DOMController {
     const grid = document.createElement("div");
     grid.classList.add("todo_grid");
     const header_text = ["Title", "Description", "Due date", "Priority"];
-    const headers = header_text.map((text) => {
+    const header_row = document.createElement("div");
+    header_row.classList.add("grid_row", "grid_header");
+    header_text.forEach((text) => {
       const header = document.createElement("div");
       header.textContent = text;
-      header.classList.add("grid_header");
-      return header;
+      header_row.appendChild(header)
     });
-    grid.append(...headers);
+    grid.append(header_row);
     project.todos.forEach((todo) => {
       const row = this.todo_row_component(todo);
-      grid.append(...row);
+      grid.append(row);
     });
     return grid;
   }
@@ -87,13 +88,16 @@ class DOMController {
       todo.dueDate || "None",
       todo.priority,
     ];
-    const content_cells = contents.map((content) => {
+    const row = document.createElement("div");
+    row.classList.add("grid_row");
+    row.classList.add(todo.priority.toLowerCase());
+    contents.forEach((content) => {
       const node = document.createElement("div");
-      node.classList.add(todo.priority.toLowerCase());
       node.textContent = content;
-      return node;
+      row.append(node);
     });
-    return content_cells;
+
+    return row;
   }
   edit_component() {
     const edit_icon = new Image();
@@ -171,7 +175,7 @@ class DOMController {
           this.nav.querySelector(".active_project").dataset.id;
         const current_project_grid = this.main.querySelector(".todo_grid");
         this.projects[active_project_id].append_todo(newTodo);
-        current_project_grid.append(...this.todo_row_component(newTodo));
+        current_project_grid.append(this.todo_row_component(newTodo));
         event.target.reset();
         this.modal.close();
       } catch (error) {
