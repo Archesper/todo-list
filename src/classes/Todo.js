@@ -31,9 +31,15 @@ class Todo {
     if (value.length > 75) {
       throw new RangeError("Todo title max 75 characters.");
     }
+    if (value === undefined) {
+      throw new TypeError("Todos must have a title.");
+    }
     this._title = value;
   }
   get dueDate() {
+    if (!this._dueDate) {
+      return this._dueDate;
+    }
     return `${this._dueDate.getMonth()}/${this._dueDate.getDate()}/${this._dueDate.getFullYear()}`;
   }
   set description(value) {

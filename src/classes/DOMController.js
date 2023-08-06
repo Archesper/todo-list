@@ -1,5 +1,6 @@
 export default DOMController;
 import Project from "./Project";
+import Todo from "./Todo";
 import edit_outline from "../assets/edit_outline.svg";
 import edit_filled from "../assets/edit_filled.svg";
 
@@ -8,12 +9,16 @@ class DOMController {
     this.projects = projects;
     this.nav = document.getElementById("projects");
     this.main = document.querySelector("main");
+    this.modal = document.querySelector("dialog");
   }
   init_display() {
     // Add add project button event listener
     const add_btn = this.nav.querySelector("button");
-    console.log(add_btn);
     add_btn.addEventListener("click", this.eventListeners().new_project);
+    this.modal.addEventListener("click", this.eventListeners().dialog_closer);
+    this.modal
+      .querySelector("form")
+      .addEventListener("submit", this.eventListeners().add_todo_submit);
     // Make project tabs
     const project_list = document.createElement("ul");
     this.nav.prepend(project_list);
@@ -38,11 +43,14 @@ class DOMController {
     icon_wrapper.classList.add("icon_wrapper");
     const header = document.createElement("h2");
     header.textContent = project.name;
-    header.addEventListener("keydown", this.eventListeners().header_force_submit);
+    header.addEventListener(
+      "keydown",
+      this.eventListeners().header_force_submit
+    );
     header.addEventListener("blur", this.eventListeners().finish_edit);
     const edit_icon = this.edit_component();
     icon_wrapper.append(header, edit_icon);
-    this.main.appendChild(icon_wrapper);
+    this.main.append(icon_wrapper, this.add_todo_component());
     // Add grid of todos
     const grid = this.todos_grid(project);
     this.main.append(grid);
@@ -67,21 +75,25 @@ class DOMController {
     });
     grid.append(...headers);
     project.todos.forEach((todo) => {
-      const contents = [
-        todo.title,
-        todo.description,
-        todo.dueDate,
-        todo.priority,
-      ];
-      const content_cells = contents.map((content) => {
-        const node = document.createElement("div");
-        node.classList.add(todo.priority.toLowerCase());
-        node.textContent = content;
-        return node;
-      });
-      grid.append(...content_cells);
+      const row = this.todo_row_component(todo);
+      grid.append(...row);
     });
     return grid;
+  }
+  todo_row_component(todo) {
+    const contents = [
+      todo.title,
+      todo.description || "...",
+      todo.dueDate || "None",
+      todo.priority,
+    ];
+    const content_cells = contents.map((content) => {
+      const node = document.createElement("div");
+      node.classList.add(todo.priority.toLowerCase());
+      node.textContent = content;
+      return node;
+    });
+    return content_cells;
   }
   edit_component() {
     const edit_icon = new Image();
@@ -90,6 +102,12 @@ class DOMController {
     edit_icon.addEventListener("mouseout", this.eventListeners().icon_unhover);
     edit_icon.addEventListener("click", this.eventListeners().begin_edit);
     return edit_icon;
+  }
+  add_todo_component() {
+    const add_btn = document.createElement("button");
+    add_btn.textContent = "+ Add Todo";
+    add_btn.addEventListener("click", this.eventListeners().add_todo_form);
+    return add_btn;
   }
   eventListeners() {
     const project_tab = (event) => {
@@ -124,8 +142,7 @@ class DOMController {
       } catch (error) {
         alert("Project titles cannot exceed 75 characters");
         event.target.textContent = this.projects[id].name;
-      }
-      finally {
+      } finally {
         event.target.contentEditable = "false";
       }
     };
@@ -137,6 +154,39 @@ class DOMController {
         event.target.blur();
       }
     };
+    const add_todo_form = (event) => {
+      this.modal.showModal();
+    };
+    const add_todo_submit = (event) => {
+      event.preventDefault();
+      const form_elements = event.target.elements;
+      const title = form_elements["title"].value || undefined;
+      const description = form_elements["description"].value || undefined;
+      const dateTimestamp = form_elements["date"].valueAsNumber;
+      const dueDate = dateTimestamp ? new Date(dateTimestamp) : undefined;
+      const priority = form_elements["priority"].value;
+      try {
+        const newTodo = new Todo(title, description, priority, dueDate);
+        const active_project_id =
+          this.nav.querySelector(".active_project").dataset.id;
+        const current_project_grid = this.main.querySelector(".todo_grid");
+        this.projects[active_project_id].append_todo(newTodo);
+        current_project_grid.append(...this.todo_row_component(newTodo));
+        event.target.reset();
+        this.modal.close();
+      } catch (error) {
+        if (error instanceof RangeError) {
+          alert("Todo titles cannot exceed 75 characters");
+        } else if (error instanceof TypeError) {
+          alert("Todos must have titles!");
+        }
+      }
+    };
+    const dialog_closer = (event) => {
+      if (event.target === this.modal) {
+        this.modal.close();
+      }
+    };
     return {
       project_tab,
       new_project,
@@ -145,6 +195,9 @@ class DOMController {
       begin_edit,
       finish_edit,
       header_force_submit,
+      add_todo_form,
+      add_todo_submit,
+      dialog_closer,
     };
   }
 }
