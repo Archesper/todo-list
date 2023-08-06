@@ -1,14 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Todos</title>
-  <script defer src="main.js"></script>
-</head>
-<body>
-  <nav></nav>
-  <main></main>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todos</title>
+    <script defer src="main.js"></script>
+  </head>
+  <body>
+    <nav>
+      <h1>Todos</h1>
+      <div id="projects"><button>+ Add Project</button></div>
+    </nav>
+    <main></main>
+    <dialog id="todo_dialog">
+      <form method="dialog">
+        <label>Title <input type="text" /></label>
+        <label for="description">Description</label>
+        <textarea name="description" id="description" cols="30" rows="10"></textarea>
+        <label>Date<input type="date"></label>
+        <label>Priority:
+          <select name="priority" id="priority">
+            <option class="low" value="LOW">Low</option>
+            <option class="medium" value="MID">Medium</option>
+            <option class="high" value="HIGH">High</option>
+            <option class="urgent" value="URGENT">Urgent</option>
+          </select>
+        </label>
+        <button type="submit">Save</button>
+      </form>
+    </dialog>
+  </body>
 </html>
