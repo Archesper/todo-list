@@ -11,7 +11,7 @@ class Todo {
       URGENT: "Urgent",
     };
   }
-  constructor(title, description, priority, dueDate = new Date) {
+  constructor(title, description, priority, dueDate) {
     this.title = title;
     this.description = description;
     this.priority = priority;
