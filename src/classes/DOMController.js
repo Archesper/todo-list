@@ -77,7 +77,8 @@ class DOMController {
     grid.append(header_row);
     project.todos.forEach((todo) => {
       const row = this.todo_row_component(todo);
-      grid.append(row);
+      const details = this.todo_details_component(todo);
+      grid.append(row, details);
     });
     return grid;
   }
@@ -98,6 +99,19 @@ class DOMController {
     });
 
     return row;
+  }
+  todo_details_component(todo) {
+    const details = document.createElement("div");
+    details.classList.add("detail_toggle");
+    const description_header = document.createElement("h3");
+    description_header.textContent = "Description:"
+    const description = document.createElement("p");
+    description.textContent = todo.description;
+    console.log(description.textContent);
+    const task_header = document.createElement("h3");
+    task_header.textContent = "Tasks:";
+    details.append(description_header, description, task_header);
+    return details;  
   }
   edit_component() {
     const edit_icon = new Image();
