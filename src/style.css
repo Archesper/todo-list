@@ -39,7 +39,6 @@ body {
 
 button {
   font-size: 12px;
-  font-weight: bold;
   border: none;
   padding: 4px;
   border-radius: 8px;
@@ -137,7 +136,7 @@ main h2:focus {
   outline: none;
 }
 
-main button {
+.todo_btn {
   margin-left: calc((100% - var(--grid-width)) / 2);
   margin-top: 0.2rem;
   border-radius: 0px;
@@ -219,6 +218,20 @@ main button {
   gap: 4px;
   align-items: center;
 }
+
+.task_btn {
+  background-color: white;
+  border-radius: 0px;
+}
+
+.task_input_wrapper {
+  display: flex;
+  align-items: center;
+  font-size: 0.8rem;
+  gap: 4px;
+}
+
+
 
 .checked {
   text-decoration: line-through;

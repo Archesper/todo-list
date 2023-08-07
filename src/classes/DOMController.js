@@ -114,11 +114,13 @@ class DOMController {
     const taskNodes = tasks.map((task, index) => {
       return this.task_node_component(task, index);
     });
+    const new_task_wrapper = this.add_task_component();
     const nested_div = document.createElement("div");
     nested_div.append(
       description_header,
       description,
       task_header,
+      new_task_wrapper,
       ...taskNodes
     );
     details.appendChild(nested_div);
@@ -158,8 +160,20 @@ class DOMController {
   add_todo_component() {
     const add_btn = document.createElement("button");
     add_btn.textContent = "+ Add Todo";
+    add_btn.classList.add("todo_btn")
     add_btn.addEventListener("click", this.eventListeners().add_todo_form);
     return add_btn;
+  }
+  add_task_component() {
+    const add_btn = document.createElement("button");
+    add_btn.textContent = "+ Add Task";
+    add_btn.classList.add("task_btn");
+    const task_input = document.createElement("input");
+    task_input.placeholder = "Add new task...";
+    const new_task_input_wrapper = document.createElement("div");
+    new_task_input_wrapper.append(task_input, add_btn);
+    new_task_input_wrapper.classList.add("task_input_wrapper")
+    return new_task_input_wrapper;
   }
   eventListeners() {
     const project_tab = (event) => {
