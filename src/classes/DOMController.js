@@ -97,7 +97,7 @@ class DOMController {
       node.textContent = content;
       row.append(node);
     });
-
+    row.addEventListener("click", this.eventListeners().details_expander);
     return row;
   }
   todo_details_component(todo) {
@@ -110,7 +110,9 @@ class DOMController {
     console.log(description.textContent);
     const task_header = document.createElement("h3");
     task_header.textContent = "Tasks:";
-    details.append(description_header, description, task_header);
+    const nested_div = document.createElement("div");
+    nested_div.append(description_header, description, task_header);
+    details.appendChild(nested_div);
     return details;  
   }
   edit_component() {
@@ -205,6 +207,17 @@ class DOMController {
         this.modal.close();
       }
     };
+    const details_expander = (event) => {
+      const details = event.currentTarget.nextSibling;
+      const active_toggle = this.main.querySelector(".active_toggle");
+      if (active_toggle) {
+        active_toggle.classList.remove("active_toggle")
+      }
+      if (active_toggle !== details) {
+        details.classList.add("active_toggle");
+      }
+
+    }
     return {
       project_tab,
       new_project,
@@ -216,6 +229,7 @@ class DOMController {
       add_todo_form,
       add_todo_submit,
       dialog_closer,
+      details_expander
     };
   }
 }

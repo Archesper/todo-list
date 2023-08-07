@@ -184,12 +184,26 @@ main button {
   border-bottom: 1px solid black;
 }
 .detail_toggle {
+  display: grid;
+  grid-template-rows: 0fr;
   background-color: rgba(240, 240, 240);
   text-align: left;
+  transition: grid-template-rows 500ms;
+}
+
+.active_toggle {
+  grid-template-rows: 1fr;
+}
+
+.detail_toggle > div {
+  overflow: hidden;
+}
+
+.active_toggle > div {
   padding: 8px;
   display: flex;
   flex-direction: column;
-  gap: 4px
+  gap: 4px;
 }
 
 .detail_toggle h3 {
