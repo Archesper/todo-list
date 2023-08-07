@@ -72,12 +72,12 @@ class DOMController {
     header_text.forEach((text) => {
       const header = document.createElement("div");
       header.textContent = text;
-      header_row.appendChild(header)
+      header_row.appendChild(header);
     });
     grid.append(header_row);
-    project.todos.forEach((todo) => {
+    project.todos.forEach((todo, index) => {
       const row = this.todo_row_component(todo);
-      const details = this.todo_details_component(todo);
+      const details = this.todo_details_component(todo, index);
       grid.append(row, details);
     });
     return grid;
@@ -100,7 +100,7 @@ class DOMController {
     row.addEventListener("click", this.eventListeners().details_expander);
     return row;
   }
-  todo_details_component(todo) {
+  todo_details_component(todo, index) {
     const details = document.createElement("div");
     details.classList.add("detail_toggle");
     const description_header = document.createElement("h3");
@@ -110,10 +110,42 @@ class DOMController {
     console.log(description.textContent);
     const task_header = document.createElement("h3");
     task_header.textContent = "Tasks:";
+    const tasks = todo.tasks;
+    const taskNodes = tasks.map((task, index) => {
+      return this.task_node_component(task, index);
+    });
     const nested_div = document.createElement("div");
-    nested_div.append(description_header, description, task_header);
+    nested_div.append(
+      description_header,
+      description,
+      task_header,
+      ...taskNodes
+    );
     details.appendChild(nested_div);
-    return details;  
+    details.dataset.id = index;
+    return details;
+  }
+  task_node_component(task, index) {
+    const taskNode = document.createElement("div");
+    const check = document.createElement("input");
+    const label = document.createElement("label");
+    check.type = "checkbox";
+    label.textContent = task.description;
+    // Whitespaces are removed because CSS IDs cannot have whitespaces
+    check.name =
+      check.id =
+      label.htmlFor =
+        task.description.replaceAll(" ", "");
+    check.checked = task.done;
+    check.dataset.id = index;
+    check.addEventListener("change", this.eventListeners().update_task_status);
+    if (task.done) {
+      label.classList.add("checked");
+    }
+    console.log(task.done);
+    taskNode.append(check, label);
+    taskNode.classList.add("task_wrapper");
+    return taskNode;
   }
   edit_component() {
     const edit_icon = new Image();
@@ -191,7 +223,10 @@ class DOMController {
           this.nav.querySelector(".active_project").dataset.id;
         const current_project_grid = this.main.querySelector(".todo_grid");
         this.projects[active_project_id].append_todo(newTodo);
-        current_project_grid.append(this.todo_row_component(newTodo), this.todo_details_component(newTodo));
+        current_project_grid.append(
+          this.todo_row_component(newTodo),
+          this.todo_details_component(newTodo)
+        );
         event.target.reset();
         this.modal.close();
       } catch (error) {
@@ -211,13 +246,28 @@ class DOMController {
       const details = event.currentTarget.nextSibling;
       const active_toggle = this.main.querySelector(".active_toggle");
       if (active_toggle) {
-        active_toggle.classList.remove("active_toggle")
+        active_toggle.classList.remove("active_toggle");
       }
       if (active_toggle !== details) {
         details.classList.add("active_toggle");
       }
-
-    }
+    };
+    const update_task_status = (event) => {
+      const active_project = document.querySelector(".active_project");
+      const expanded_details = document.querySelector(".active_toggle");
+      const project_id = active_project.dataset.id;
+      const todo_id = expanded_details.dataset.id;
+      const task_id = event.target.dataset.id;
+      const corresponding_task = this.projects[project_id].todos[todo_id].tasks[task_id];
+      const done = event.target.checked;
+      const task_label = event.target.nextSibling;
+      corresponding_task.done = done;
+      if (done) {
+        task_label.classList.add("checked");
+      } else {
+        task_label.classList.remove("checked");
+      }
+    };
     return {
       project_tab,
       new_project,
@@ -229,7 +279,8 @@ class DOMController {
       add_todo_form,
       add_todo_submit,
       dialog_closer,
-      details_expander
+      details_expander,
+      update_task_status
     };
   }
 }

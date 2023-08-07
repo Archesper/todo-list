@@ -183,6 +183,9 @@ main button {
 :nth-last-child(2 of .detail_toggle) {
   border-bottom: 1px solid black;
 }
+:nth-last-child(1 of .active_toggle) {
+  border-top: 1px solid black;
+}
 .detail_toggle {
   display: grid;
   grid-template-rows: 0fr;
@@ -208,6 +211,18 @@ main button {
 
 .detail_toggle h3 {
   font-size: 1.15rem;
+}
+
+.task_wrapper {
+  display: flex;
+  font-size: 0.9rem;
+  gap: 4px;
+  align-items: center;
+}
+
+.checked {
+  text-decoration: line-through;
+  color: gray;
 }
 
 .grid_header {
