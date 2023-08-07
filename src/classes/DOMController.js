@@ -104,7 +104,7 @@ class DOMController {
     const details = document.createElement("div");
     details.classList.add("detail_toggle");
     const description_header = document.createElement("h3");
-    description_header.textContent = "Description:"
+    description_header.textContent = todo.title + ":";
     const description = document.createElement("p");
     description.textContent = todo.description;
     console.log(description.textContent);
