@@ -27,11 +27,12 @@ class Todo {
   get priority() {
     return this._priority
   }
+
   set title(value) {
     if (value.length > 75) {
       throw new RangeError("Todo title max 75 characters.");
     }
-    if (value === undefined) {
+    if (value === undefined || value.trim() === "") {
       throw new TypeError("Todos must have a title.");
     }
     this._title = value;
