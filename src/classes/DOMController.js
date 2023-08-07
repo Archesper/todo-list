@@ -106,7 +106,7 @@ class DOMController {
     const description_header = document.createElement("h3");
     description_header.textContent = todo.title + ":";
     const description = document.createElement("p");
-    description.textContent = todo.description;
+    description.textContent = todo.description || "No description";
     console.log(description.textContent);
     const task_header = document.createElement("h3");
     task_header.textContent = "Tasks:";
@@ -191,7 +191,7 @@ class DOMController {
           this.nav.querySelector(".active_project").dataset.id;
         const current_project_grid = this.main.querySelector(".todo_grid");
         this.projects[active_project_id].append_todo(newTodo);
-        current_project_grid.append(this.todo_row_component(newTodo));
+        current_project_grid.append(this.todo_row_component(newTodo), this.todo_details_component(newTodo));
         event.target.reset();
         this.modal.close();
       } catch (error) {
