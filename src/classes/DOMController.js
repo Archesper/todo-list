@@ -1,6 +1,7 @@
 export default DOMController;
 import Project from "./Project";
 import Todo from "./Todo";
+import Task from "./Task"
 import edit_outline from "../assets/edit_outline.svg";
 import edit_filled from "../assets/edit_filled.svg";
 
@@ -168,6 +169,7 @@ class DOMController {
     const add_btn = document.createElement("button");
     add_btn.textContent = "+ Add Task";
     add_btn.classList.add("task_btn");
+    add_btn.addEventListener("click", this.eventListeners().add_task);
     const task_input = document.createElement("input");
     task_input.placeholder = "Add new task...";
     const new_task_input_wrapper = document.createElement("div");
@@ -282,6 +284,23 @@ class DOMController {
         task_label.classList.remove("checked");
       }
     };
+    const add_task = (event) => {
+      const active_project = document.querySelector(".active_project");
+      const task_input = event.target.previousSibling;
+      try {
+        const new_task = new Task(task_input.value);
+        const active_toggle = this.main.querySelector(".active_toggle");
+        const project_id = active_project.dataset.id;
+        const todo_id = active_toggle.dataset.id;
+        const index = active_toggle.querySelectorAll("label").length;
+        active_toggle.firstChild.append(this.task_node_component(new_task, index))
+        this.projects[project_id].todos[todo_id].append_task(new_task);
+      } catch (error) {
+        console.log(error);
+        alert("Tasks must have descriptions!");        
+      }
+
+    }
     return {
       project_tab,
       new_project,
@@ -294,7 +313,8 @@ class DOMController {
       add_todo_submit,
       dialog_closer,
       details_expander,
-      update_task_status
+      update_task_status,
+      add_task
     };
   }
 }

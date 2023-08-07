@@ -1,9 +1,9 @@
 export default Task
 
 class Task {
-  constructor(description) {
+  constructor(description, done = false) {
     this.description = description;
-    this.done = false;
+    this.done = done;
   }
   toggle_status() {
     this.done = !this.done;
@@ -18,6 +18,9 @@ class Task {
     return this._description;
   }
   set description(value) {
+    if (value === undefined || value.trim() === "") {
+      throw new TypeError("Tasks must have descriptions.");
+    }
     this._description = value;
   }
 }
