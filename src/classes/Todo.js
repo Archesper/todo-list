@@ -29,19 +29,16 @@ class Todo {
   }
 
   set title(value) {
-    if (value.length > 75) {
-      throw new RangeError("Todo title max 75 characters.");
-    }
     if (value === undefined || value.trim() === "") {
       throw new TypeError("Todos must have a title.");
+    }
+    if (value.length > 75) {
+      throw new RangeError("Todo title max 75 characters.");
     }
     this._title = value;
   }
   get dueDate() {
-    if (!this._dueDate) {
-      return this._dueDate;
-    }
-    return `${this._dueDate.getMonth()}/${this._dueDate.getDate()}/${this._dueDate.getFullYear()}`;
+    return this._dueDate;
   }
   set description(value) {
     this._description = value;

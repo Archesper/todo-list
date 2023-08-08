@@ -107,7 +107,7 @@ main {
   padding: 12px;
 }
 
-.icon_wrapper {
+.icon_wrapper, .description_wrapper {
   display: flex;
   align-items: center;
 }
@@ -176,13 +176,15 @@ main h2:focus {
   text-overflow: ellipsis;
 }
 
+/* These properties keep table borders consistent ( the last element
+never has a bottom border, the rest must ) */
 :nth-last-child(1 of .grid_row) {
   border: none;
 }
-:nth-last-child(2 of .detail_toggle) {
+.active_toggle:nth-last-child(2 of .detail_toggle) {
   border-bottom: 1px solid black;
 }
-:nth-last-child(1 of .active_toggle) {
+.active_toggle:nth-last-child(1 of .detail_toggle) {
   border-top: 1px solid black;
 }
 .detail_toggle {
@@ -210,6 +212,15 @@ main h2:focus {
 
 .detail_toggle h3 {
   font-size: 1.15rem;
+}
+
+.description_wrapper {
+  gap: 4px;
+}
+
+.description_wrapper img {
+  width: 18px;
+  cursor: pointer;
 }
 
 .task_wrapper {
