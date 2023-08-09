@@ -61,6 +61,7 @@ class DOMController {
     header.addEventListener("blur", this.eventListeners().finish_project_edit);
     const edit_icon = this.edit_component("project");
     const delete_icon = this.delete_component();
+    delete_icon.dataset.type = "project";
     icon_wrapper.append(header, edit_icon, delete_icon);
     this.main.append(icon_wrapper, this.add_todo_component());
     // Add grid of todos
@@ -129,6 +130,7 @@ class DOMController {
     description_header.textContent = todo.title + ":";
     const edit_icon = this.edit_component("todo");
     const delete_icon = this.delete_component();
+    delete_icon.dataset.type = "todo";
     description_header_wrapper.append(description_header, edit_icon, delete_icon);
     const description = document.createElement("p");
     description.textContent = todo.description || "No description";
@@ -158,6 +160,7 @@ class DOMController {
     const check = document.createElement("input");
     const label = document.createElement("label");
     const delete_icon = this.delete_component();
+    delete_icon.dataset.type = "task";
     check.type = "checkbox";
     label.textContent = task.description;
     // Whitespaces are removed because CSS IDs cannot have whitespaces
@@ -198,6 +201,7 @@ class DOMController {
     delete_icon.src = delete_outline;
     delete_icon.addEventListener("mouseover", (event) => {this.eventListeners().icon_hover(event, "delete")});
     delete_icon.addEventListener("mouseout", (event)=> {this.eventListeners().icon_unhover(event, "delete")});
+    delete_icon.addEventListener("click", this.eventListeners().delete_handler);
     return delete_icon;
   }
   add_todo_component() {
@@ -376,6 +380,27 @@ class DOMController {
         alert("Tasks must have descriptions!");
       }
     };
+    const delete_handler = (event) => {
+      const type = event.target.dataset.type;
+      if (window.confirm(`Do you really want to delete this ${type}?`)) {
+        const active_project = document.querySelector(".active_project");
+        if (type === "project") {
+          if (this.projects.length === 1) {
+            alert("You can't remove your only project!");
+            return;
+          } else {
+            const project_list = document.getElementById("projects").querySelector("ul");
+            active_project.remove();
+            console.log(Array.from(project_list.childNodes));
+            Array.from(project_list.childNodes).slice(active_project.dataset.id, this.projects.length).forEach((project) => {
+              project.dataset.id -= 1;
+            })
+            this.projects.splice(active_project.dataset.id, 1);
+            this.switch_project(this.projects[0]);
+          }
+        }
+      }
+    };
     return {
       project_tab,
       new_project,
@@ -391,6 +416,7 @@ class DOMController {
       details_expander,
       update_task_status,
       add_task,
+      delete_handler
     };
   }
 }
