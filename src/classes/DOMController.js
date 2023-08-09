@@ -4,6 +4,8 @@ import Todo from "./Todo";
 import Task from "./Task";
 import edit_outline from "../assets/edit_outline.svg";
 import edit_filled from "../assets/edit_filled.svg";
+import delete_outline from "../assets/delete_outline.svg"
+import delete_filled from "../assets/delete_filled.svg";
 
 class DOMController {
   constructor(projects = []) {
@@ -28,6 +30,14 @@ class DOMController {
     // Display first project contents
     this.switch_project(this.projects[0]);
   }
+  icons() {
+    return {
+      'edit_outline': edit_outline,
+      'edit_filled': edit_filled,
+      'delete_outline': delete_outline,
+      'delete_filled': delete_filled
+    }
+  }
   switch_project(project) {
     // Switch highlighted project in navbar
     const current_project = this.nav.querySelector(".active_project");
@@ -50,7 +60,8 @@ class DOMController {
     );
     header.addEventListener("blur", this.eventListeners().finish_project_edit);
     const edit_icon = this.edit_component("project");
-    icon_wrapper.append(header, edit_icon);
+    const delete_icon = this.delete_component();
+    icon_wrapper.append(header, edit_icon, delete_icon);
     this.main.append(icon_wrapper, this.add_todo_component());
     // Add grid of todos
     const grid = this.todos_grid(project);
@@ -112,12 +123,13 @@ class DOMController {
   todo_details_component(todo, index) {
     const details = document.createElement("div");
     details.classList.add("detail_toggle");
-    const description_wrapper = document.createElement("div");
-    description_wrapper.classList.add("description_wrapper");
+    const description_header_wrapper = document.createElement("div");
+    description_header_wrapper.classList.add("description_header_wrapper");
     const description_header = document.createElement("h3");
     description_header.textContent = todo.title + ":";
     const edit_icon = this.edit_component("todo");
-    description_wrapper.append(description_header, edit_icon);
+    const delete_icon = this.delete_component();
+    description_header_wrapper.append(description_header, edit_icon, delete_icon);
     const description = document.createElement("p");
     description.textContent = todo.description || "No description";
     const task_header = document.createElement("h3");
@@ -131,7 +143,7 @@ class DOMController {
     const new_task_wrapper = this.add_task_component();
     const nested_div = document.createElement("div");
     nested_div.append(
-      description_wrapper,
+      description_header_wrapper,
       description,
       task_header,
       new_task_wrapper,
@@ -145,6 +157,7 @@ class DOMController {
     const taskNode = document.createElement("div");
     const check = document.createElement("input");
     const label = document.createElement("label");
+    const delete_icon = this.delete_component();
     check.type = "checkbox";
     label.textContent = task.description;
     // Whitespaces are removed because CSS IDs cannot have whitespaces
@@ -158,15 +171,15 @@ class DOMController {
     if (task.done) {
       label.classList.add("checked");
     }
-    taskNode.append(check, label);
+    taskNode.append(check, label, delete_icon);
     taskNode.classList.add("task_wrapper");
     return taskNode;
   }
   edit_component(editable) {
     const edit_icon = new Image();
     edit_icon.src = edit_outline;
-    edit_icon.addEventListener("mouseover", this.eventListeners().icon_hover);
-    edit_icon.addEventListener("mouseout", this.eventListeners().icon_unhover);
+    edit_icon.addEventListener("mouseover", (event) => {this.eventListeners().icon_hover(event, "edit")});
+    edit_icon.addEventListener("mouseout", (event)=> {this.eventListeners().icon_unhover(event, "edit")});
     if (editable === "project") {
       edit_icon.addEventListener(
         "click",
@@ -179,6 +192,13 @@ class DOMController {
       })
     }
     return edit_icon;
+  }
+  delete_component() {
+    const delete_icon = new Image();
+    delete_icon.src = delete_outline;
+    delete_icon.addEventListener("mouseover", (event) => {this.eventListeners().icon_hover(event, "delete")});
+    delete_icon.addEventListener("mouseout", (event)=> {this.eventListeners().icon_unhover(event, "delete")});
+    return delete_icon;
   }
   add_todo_component() {
     const add_btn = document.createElement("button");
@@ -211,11 +231,13 @@ class DOMController {
       this.add_project(project, id);
       this.switch_project(project);
     };
-    const icon_hover = (event) => {
-      event.target.src = edit_filled;
+    const icon_hover = (event, icon) => {
+      const newState = this.icons()[`${icon}_filled`]
+      event.target.src = newState;
     };
-    const icon_unhover = (event) => {
-      event.target.src = edit_outline;
+    const icon_unhover = (event, icon) => {
+      const newState = this.icons()[`${icon}_outline`]
+      event.target.src = newState;
     };
     const begin_project_edit = (event) => {
       const active_project_header = this.main.querySelector("h2");
