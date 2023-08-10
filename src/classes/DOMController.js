@@ -4,7 +4,7 @@ import Todo from "./Todo";
 import Task from "./Task";
 import edit_outline from "../assets/edit_outline.svg";
 import edit_filled from "../assets/edit_filled.svg";
-import delete_outline from "../assets/delete_outline.svg"
+import delete_outline from "../assets/delete_outline.svg";
 import delete_filled from "../assets/delete_filled.svg";
 
 class DOMController {
@@ -13,6 +13,34 @@ class DOMController {
     this.nav = document.getElementById("projects");
     this.main = document.querySelector("main");
     this.modal = document.querySelector("dialog");
+  }
+  getCurrentProject() {
+    const tab = this.nav.querySelector(".active_project");
+    if (!tab) {
+      return undefined;
+    }
+    const id = tab.dataset.id;
+    const object = this.projects[id];
+    return {
+      tab: tab,
+      id: id,
+      object: object,
+    };
+  }
+  getExpandedTodo() {
+    const details = this.main.querySelector(".active_toggle");
+    if (!details) {
+      return undefined;
+    }
+    const row = details.previousSibling;
+    const id = row.dataset.id;
+    const object = this.getCurrentProject().object.todos[id];
+    return {
+      details: details,
+      row: row,
+      id: id,
+      object: object
+    }
   }
   init_display() {
     // Add add project button event listener
@@ -32,17 +60,17 @@ class DOMController {
   }
   icons() {
     return {
-      'edit_outline': edit_outline,
-      'edit_filled': edit_filled,
-      'delete_outline': delete_outline,
-      'delete_filled': delete_filled
-    }
+      edit_outline: edit_outline,
+      edit_filled: edit_filled,
+      delete_outline: delete_outline,
+      delete_filled: delete_filled,
+    };
   }
   switch_project(project) {
     // Switch highlighted project in navbar
-    const current_project = this.nav.querySelector(".active_project");
+    const current_project = this.getCurrentProject();
     if (current_project) {
-      current_project.classList.remove("active_project");
+      current_project.tab.classList.remove("active_project");
     }
     const id = this.projects.indexOf(project);
     const new_active_project = this.nav.querySelector(`[data-id="${id}"]`);
@@ -99,7 +127,9 @@ class DOMController {
     let formattedDate;
     if (todo.dueDate) {
       const dateObject = new Date(todo.dueDate);
-      formattedDate =`${dateObject.getMonth() + 1}/${dateObject.getDate()}/${dateObject.getFullYear()}`;
+      formattedDate = `${
+        dateObject.getMonth() + 1
+      }/${dateObject.getDate()}/${dateObject.getFullYear()}`;
     } else {
       formattedDate = "None";
     }
@@ -131,7 +161,11 @@ class DOMController {
     const edit_icon = this.edit_component("todo");
     const delete_icon = this.delete_component();
     delete_icon.dataset.type = "todo";
-    description_header_wrapper.append(description_header, edit_icon, delete_icon);
+    description_header_wrapper.append(
+      description_header,
+      edit_icon,
+      delete_icon
+    );
     const description = document.createElement("p");
     description.textContent = todo.description || "No description";
     const task_header = document.createElement("h3");
@@ -181,8 +215,12 @@ class DOMController {
   edit_component(editable) {
     const edit_icon = new Image();
     edit_icon.src = edit_outline;
-    edit_icon.addEventListener("mouseover", (event) => {this.eventListeners().icon_hover(event, "edit")});
-    edit_icon.addEventListener("mouseout", (event)=> {this.eventListeners().icon_unhover(event, "edit")});
+    edit_icon.addEventListener("mouseover", (event) => {
+      this.eventListeners().icon_hover(event, "edit");
+    });
+    edit_icon.addEventListener("mouseout", (event) => {
+      this.eventListeners().icon_unhover(event, "edit");
+    });
     if (editable === "project") {
       edit_icon.addEventListener(
         "click",
@@ -192,15 +230,19 @@ class DOMController {
       edit_icon.addEventListener("click", (event) => {
         const index = edit_icon.closest(".detail_toggle").dataset.id;
         this.eventListeners().add_todo_form(event, index);
-      })
+      });
     }
     return edit_icon;
   }
   delete_component() {
     const delete_icon = new Image();
     delete_icon.src = delete_outline;
-    delete_icon.addEventListener("mouseover", (event) => {this.eventListeners().icon_hover(event, "delete")});
-    delete_icon.addEventListener("mouseout", (event)=> {this.eventListeners().icon_unhover(event, "delete")});
+    delete_icon.addEventListener("mouseover", (event) => {
+      this.eventListeners().icon_hover(event, "delete");
+    });
+    delete_icon.addEventListener("mouseout", (event) => {
+      this.eventListeners().icon_unhover(event, "delete");
+    });
     delete_icon.addEventListener("click", this.eventListeners().delete_handler);
     return delete_icon;
   }
@@ -236,11 +278,11 @@ class DOMController {
       this.switch_project(project);
     };
     const icon_hover = (event, icon) => {
-      const newState = this.icons()[`${icon}_filled`]
+      const newState = this.icons()[`${icon}_filled`];
       event.target.src = newState;
     };
     const icon_unhover = (event, icon) => {
-      const newState = this.icons()[`${icon}_outline`]
+      const newState = this.icons()[`${icon}_outline`];
       event.target.src = newState;
     };
     const begin_project_edit = (event) => {
@@ -249,12 +291,13 @@ class DOMController {
       active_project_header.focus();
     };
     const finish_project_edit = (event) => {
-      const active_project_tab = this.nav.querySelector(".active_project");
+      const active_project = this.getCurrentProject();
+      const projectTab = active_project.tab;
+      const id = active_project.id;
       const newName = event.target.textContent;
-      const id = active_project_tab.dataset.id;
       try {
         this.projects[id].name = newName;
-        active_project_tab.textContent = newName;
+        projectTab.textContent = newName;
       } catch (error) {
         alert("Project titles cannot exceed 75 characters");
         event.target.textContent = this.projects[id].name;
@@ -275,9 +318,9 @@ class DOMController {
       if (index) {
         const form = this.modal.querySelector("form");
         const elements = form.elements;
-        const active_project = this.nav.querySelector(".active_project");
-        const project_id = active_project.dataset.id;
-        const todoToEdit = this.projects[project_id].todos[index];
+        const active_project = this.getCurrentProject();
+        const projectID = active_project.id;
+        const todoToEdit = this.projects[projectID].todos[index];
         elements["title"].value = todoToEdit.title;
         elements["description"].value = todoToEdit.description;
         elements["date"].valueAsNumber = todoToEdit.dueDate;
@@ -297,19 +340,23 @@ class DOMController {
       console.log(index);
       try {
         const newTodo = new Todo(title, description, priority, dueDate);
-        const active_project_id =
-          this.nav.querySelector(".active_project").dataset.id;
-        const current_project_grid = this.main.querySelector(".todo_grid");
+        const activeProject = this.getCurrentProject();
+        const currentProjectGrid = this.main.querySelector(".todo_grid");
         if (index) {
-          this.projects[active_project_id].todos[index] = newTodo;
-          const updatedTodo = this.main.querySelector(`.grid_row[data-id="${index}"]`);
-          const updatedTodoDetails = this.main.querySelector(`.detail_toggle[data-id="${index}"]`);
+          activeProject.object.todos[index] = newTodo;
+          const updatedTodo = this.main.querySelector(
+            `.grid_row[data-id="${index}"]`
+          );
+          const updatedTodoDetails = this.main.querySelector(
+            `.detail_toggle[data-id="${index}"]`
+          );
           updatedTodo.replaceWith(this.todo_row_component(newTodo, index));
-          updatedTodoDetails.replaceWith(this.todo_details_component(newTodo, index))
-        }
-        else {
-          this.projects[active_project_id].append_todo(newTodo);
-          current_project_grid.append(
+          updatedTodoDetails.replaceWith(
+            this.todo_details_component(newTodo, index)
+          );
+        } else {
+          activeProject.object.append_todo(newTodo);
+          currentProjectGrid.append(
             this.todo_row_component(newTodo),
             this.todo_details_component(newTodo)
           );
@@ -334,25 +381,23 @@ class DOMController {
     const form_reset = (event) => {
       const form = this.modal.querySelector("form");
       form.reset();
-    }
+    };
     const details_expander = (event) => {
+      const active_toggle = this.getExpandedTodo();
       const details = event.currentTarget.nextSibling;
-      const active_toggle = this.main.querySelector(".active_toggle");
       if (active_toggle) {
-        active_toggle.classList.remove("active_toggle");
-      }
-      if (active_toggle !== details) {
+        active_toggle.details.classList.remove("active_toggle");
+        if (active_toggle.details !== details) {
+          details.classList.add("active_toggle");
+        }
+      } else {
         details.classList.add("active_toggle");
       }
     };
     const update_task_status = (event) => {
-      const active_project = document.querySelector(".active_project");
-      const expanded_details = document.querySelector(".active_toggle");
-      const project_id = active_project.dataset.id;
-      const todo_id = expanded_details.dataset.id;
+      const expandedTodo = this.getExpandedTodo();
       const task_id = event.target.dataset.id;
-      const corresponding_task =
-        this.projects[project_id].todos[todo_id].tasks[task_id];
+      const corresponding_task = expandedTodo.object.tasks[task_id];
       const done = event.target.checked;
       const task_label = event.target.nextSibling;
       corresponding_task.done = done;
@@ -364,18 +409,16 @@ class DOMController {
     };
     // TODO: make clicking enter add the task, restyle input:focus
     const add_task = (event) => {
-      const active_project = document.querySelector(".active_project");
       const task_input = event.target.previousSibling;
       try {
-        const new_task = new Task(task_input.value);
-        const active_toggle = this.main.querySelector(".active_toggle");
-        const project_id = active_project.dataset.id;
-        const todo_id = active_toggle.dataset.id;
-        const index = active_toggle.querySelectorAll("label").length;
-        active_toggle.firstChild.append(
-          this.task_node_component(new_task, index)
+        const newTask = new Task(task_input.value);
+        const expandedTodo = this.getExpandedTodo();
+        const activeToggle = expandedTodo.details;
+        const index = activeToggle.querySelectorAll("label").length;
+        activeToggle.firstChild.append(
+          this.task_node_component(newTask, index)
         );
-        this.projects[project_id].todos[todo_id].append_task(new_task);
+        expandedTodo.object.append_task(new_task);
       } catch (error) {
         alert("Tasks must have descriptions!");
       }
@@ -383,46 +426,54 @@ class DOMController {
     const delete_handler = (event) => {
       const type = event.target.dataset.type;
       if (window.confirm(`Do you really want to delete this ${type}?`)) {
-        const active_project = document.querySelector(".active_project");
+        const active_project = this.getCurrentProject();
         if (type === "project") {
           if (this.projects.length === 1) {
             alert("You can't remove your only project!");
             return;
           } else {
-            const project_list = document.getElementById("projects").querySelector("ul");
-            active_project.remove();
-            console.log(Array.from(project_list.childNodes));
-            Array.from(project_list.childNodes).slice(active_project.dataset.id, this.projects.length).forEach((project) => {
-              project.dataset.id -= 1;
-            })
-            this.projects.splice(active_project.dataset.id, 1);
+            const project_list = document
+              .getElementById("projects")
+              .querySelector("ul");
+            active_project.tab.remove();
+            Array.from(project_list.childNodes)
+              .slice(active_project.id, this.projects.length)
+              .forEach((project) => {
+                project.dataset.id -= 1;
+              });
+            this.projects.splice(active_project.id, 1);
             this.switch_project(this.projects[0]);
           }
         } else if (type === "todo") {
-          const todoDetails = event.target.closest(".detail_toggle");
-          const todoID = todoDetails.dataset.id;
-          const todoNode = document.querySelector(`.grid_row[data-id="${todoID}"]`);
+          const expandedTodo = this.getExpandedTodo();
+          // TODO Clean this up with object destructuring
+          const todoDetails = expandedTodo.details;
+          const todoID = expandedTodo.id;
+          const todoNode = expandedTodo.row;
           todoDetails.remove();
           todoNode.remove();
-          this.projects[active_project.dataset.id].todos.splice(todoID, 1);
+          active_project.object.todos.splice(todoID, 1);
           // The switch_project method takes care of readjusting the indexing
-          this.switch_project(this.projects[active_project.dataset.id]);
+          this.switch_project(active_project.object);
         } else if (type == "task") {
+          const expandedTodo = this.getExpandedTodo();
+          const todoDetails = expandedTodo.details;
+          const todoObject = expandedTodo.object;
           const taskNode = event.target.parentElement;
           const taskID = taskNode.querySelector("input").dataset.id;
-          const todoDetails = event.target.closest(".detail_toggle");
-          const todoID = todoDetails.dataset.id;
-          const todoObject = this.projects[active_project.dataset.id].todos[todoID];
           taskNode.remove();
           todoObject.tasks.splice(taskID, 1);
-          const taskInputs = todoDetails.querySelectorAll("input[type='checkbox']");
-          console.log(taskInputs);
-          Array.from(taskInputs).slice(taskID, taskInputs.length).forEach((task) => {
-            task.dataset.id -= 1;
-          })
-          
+          const taskInputs = todoDetails.querySelectorAll(
+            "input[type='checkbox']"
+          );
+          Array.from(taskInputs)
+            .slice(taskID, taskInputs.length)
+            .forEach((task) => {
+              task.dataset.id -= 1;
+            });
         }
       }
+    };
     };
     return {
       project_tab,
@@ -439,7 +490,7 @@ class DOMController {
       details_expander,
       update_task_status,
       add_task,
-      delete_handler
+      delete_handler,
     };
   }
 }
