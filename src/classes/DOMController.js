@@ -291,16 +291,14 @@ class DOMController {
       active_project_header.focus();
     };
     const finish_project_edit = (event) => {
-      const active_project = this.getCurrentProject();
-      const projectTab = active_project.tab;
-      const id = active_project.id;
+      const {tab: projectTab, object: projectObject} = this.getCurrentProject();
       const newName = event.target.textContent;
       try {
-        this.projects[id].name = newName;
+        projectObject.name = newName;
         projectTab.textContent = newName;
       } catch (error) {
         alert("Project titles cannot exceed 75 characters");
-        event.target.textContent = this.projects[id].name;
+        event.target.textContent = projectObject.name;
       } finally {
         event.target.contentEditable = "false";
       }
@@ -318,9 +316,7 @@ class DOMController {
       if (index) {
         const form = this.modal.querySelector("form");
         const elements = form.elements;
-        const active_project = this.getCurrentProject();
-        const projectID = active_project.id;
-        const todoToEdit = this.projects[projectID].todos[index];
+        const todoToEdit = this.getExpandedTodo().object;
         elements["title"].value = todoToEdit.title;
         elements["description"].value = todoToEdit.description;
         elements["date"].valueAsNumber = todoToEdit.dueDate;
@@ -337,13 +333,12 @@ class DOMController {
       const dueDate = form_elements["date"].valueAsNumber;
       const priority = form_elements["priority"].value;
       const index = form_elements["index"].value;
-      console.log(index);
       try {
         const newTodo = new Todo(title, description, priority, dueDate);
-        const activeProject = this.getCurrentProject();
+        const activeProjectObject = this.getCurrentProject().object;
         const currentProjectGrid = this.main.querySelector(".todo_grid");
         if (index) {
-          activeProject.object.todos[index] = newTodo;
+          activeProjectObject.todos[index] = newTodo;
           const updatedTodo = this.main.querySelector(
             `.grid_row[data-id="${index}"]`
           );
@@ -355,8 +350,8 @@ class DOMController {
             this.todo_details_component(newTodo, index)
           );
         } else {
-          const index = activeProject.object.todos.length;
-          activeProject.object.append_todo(newTodo);
+          const index = activeProjectObject.todos.length;
+          activeProjectObject.append_todo(newTodo);
           currentProjectGrid.append(
             this.todo_row_component(newTodo, index),
             this.todo_details_component(newTodo, index)
@@ -396,9 +391,8 @@ class DOMController {
       }
     };
     const update_task_status = (event) => {
-      const expandedTodo = this.getExpandedTodo();
       const task_id = event.target.dataset.id;
-      const corresponding_task = expandedTodo.object.tasks[task_id];
+      const corresponding_task = this.getExpandedTodo().object.tasks[task_id];
       const done = event.target.checked;
       const task_label = event.target.nextSibling;
       corresponding_task.done = done;
@@ -413,13 +407,12 @@ class DOMController {
       const task_input = event.target.previousSibling;
       try {
         const newTask = new Task(task_input.value);
-        const expandedTodo = this.getExpandedTodo();
-        const activeToggle = expandedTodo.details;
-        const index = activeToggle.querySelectorAll("label").length;
+        const {details: activeToggle, object: todoObject} = this.getExpandedTodo();
+        const index = todoObject.tasks.length;
         activeToggle.firstChild.append(
           this.task_node_component(newTask, index)
         );
-        expandedTodo.object.append_task(newTask);
+        todoObject.append_task(newTask);
       } catch (error) {
         alert("Tasks must have descriptions!");
       }
@@ -446,20 +439,14 @@ class DOMController {
             this.switch_project(this.projects[0]);
           }
         } else if (type === "todo") {
-          const expandedTodo = this.getExpandedTodo();
-          // TODO Clean this up with object destructuring
-          const todoDetails = expandedTodo.details;
-          const todoID = expandedTodo.id;
-          const todoNode = expandedTodo.row;
+          const {details: todoDetails, id: todoID, row: todoNode} = this.getExpandedTodo();
           todoDetails.remove();
           todoNode.remove();
           active_project.object.todos.splice(todoID, 1);
           // The switch_project method takes care of readjusting the indexing
           this.switch_project(active_project.object);
         } else if (type == "task") {
-          const expandedTodo = this.getExpandedTodo();
-          const todoDetails = expandedTodo.details;
-          const todoObject = expandedTodo.object;
+          const {details: todoDetails, object: todoObject} = this.getExpandedTodo();
           const taskNode = event.target.parentElement;
           const taskID = taskNode.querySelector("input").dataset.id;
           taskNode.remove();
