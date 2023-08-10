@@ -398,6 +398,29 @@ class DOMController {
             this.projects.splice(active_project.dataset.id, 1);
             this.switch_project(this.projects[0]);
           }
+        } else if (type === "todo") {
+          const todoDetails = event.target.closest(".detail_toggle");
+          const todoID = todoDetails.dataset.id;
+          const todoNode = document.querySelector(`.grid_row[data-id="${todoID}"]`);
+          todoDetails.remove();
+          todoNode.remove();
+          this.projects[active_project.dataset.id].todos.splice(todoID, 1);
+          // The switch_project method takes care of readjusting the indexing
+          this.switch_project(this.projects[active_project.dataset.id]);
+        } else if (type == "task") {
+          const taskNode = event.target.parentElement;
+          const taskID = taskNode.querySelector("input").dataset.id;
+          const todoDetails = event.target.closest(".detail_toggle");
+          const todoID = todoDetails.dataset.id;
+          const todoObject = this.projects[active_project.dataset.id].todos[todoID];
+          taskNode.remove();
+          todoObject.tasks.splice(taskID, 1);
+          const taskInputs = todoDetails.querySelectorAll("input[type='checkbox']");
+          console.log(taskInputs);
+          Array.from(taskInputs).slice(taskID, taskInputs.length).forEach((task) => {
+            task.dataset.id -= 1;
+          })
+          
         }
       }
     };
