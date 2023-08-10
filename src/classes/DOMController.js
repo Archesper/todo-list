@@ -39,8 +39,8 @@ class DOMController {
       details: details,
       row: row,
       id: id,
-      object: object,
-    };
+      object: object
+    }
   }
   init_display() {
     // Add add project button event listener
@@ -355,10 +355,11 @@ class DOMController {
             this.todo_details_component(newTodo, index)
           );
         } else {
+          const index = activeProject.object.todos.length;
           activeProject.object.append_todo(newTodo);
           currentProjectGrid.append(
-            this.todo_row_component(newTodo),
-            this.todo_details_component(newTodo)
+            this.todo_row_component(newTodo, index),
+            this.todo_details_component(newTodo, index)
           );
         }
         event.target.reset();
