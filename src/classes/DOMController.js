@@ -39,8 +39,8 @@ class DOMController {
       details: details,
       row: row,
       id: id,
-      object: object
-    }
+      object: object,
+    };
   }
   init_display() {
     // Add add project button event listener
@@ -418,7 +418,7 @@ class DOMController {
         activeToggle.firstChild.append(
           this.task_node_component(newTask, index)
         );
-        expandedTodo.object.append_task(new_task);
+        expandedTodo.object.append_task(newTask);
       } catch (error) {
         alert("Tasks must have descriptions!");
       }
@@ -473,7 +473,6 @@ class DOMController {
             });
         }
       }
-    };
     };
     return {
       project_tab,
