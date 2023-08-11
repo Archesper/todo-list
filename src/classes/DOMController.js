@@ -39,8 +39,8 @@ class DOMController {
       details: details,
       row: row,
       id: id,
-      object: object
-    }
+      object: object,
+    };
   }
   init_display() {
     // Add add project button event listener
@@ -260,6 +260,7 @@ class DOMController {
     add_btn.addEventListener("click", this.eventListeners().add_task);
     const task_input = document.createElement("input");
     task_input.placeholder = "Add new task...";
+    task_input.addEventListener("keydown", this.eventListeners().add_task);
     const new_task_input_wrapper = document.createElement("div");
     new_task_input_wrapper.append(task_input, add_btn);
     new_task_input_wrapper.classList.add("task_input_wrapper");
@@ -291,7 +292,8 @@ class DOMController {
       active_project_header.focus();
     };
     const finish_project_edit = (event) => {
-      const {tab: projectTab, object: projectObject} = this.getCurrentProject();
+      const { tab: projectTab, object: projectObject } =
+        this.getCurrentProject();
       const newName = event.target.textContent;
       try {
         projectObject.name = newName;
@@ -404,17 +406,24 @@ class DOMController {
     };
     // TODO: make clicking enter add the task, restyle input:focus
     const add_task = (event) => {
-      const task_input = event.target.previousSibling;
-      try {
-        const newTask = new Task(task_input.value);
-        const {details: activeToggle, object: todoObject} = this.getExpandedTodo();
-        const index = todoObject.tasks.length;
-        activeToggle.firstChild.append(
-          this.task_node_component(newTask, index)
-        );
-        todoObject.append_task(newTask);
-      } catch (error) {
-        alert("Tasks must have descriptions!");
+      if (event.keyCode === 13 || event.target.tagName === "BUTTON") {
+        try {
+          const { details: activeToggle, object: todoObject } =
+            this.getExpandedTodo();
+          const task_input = activeToggle
+            .querySelector(".task_input_wrapper")
+            .querySelector("input");
+          const newTask = new Task(task_input.value);
+          const index = todoObject.tasks.length;
+          activeToggle.firstChild.append(
+            this.task_node_component(newTask, index)
+          );
+          todoObject.append_task(newTask);
+          task_input.value = "";
+        } catch (error) {
+          alert("Tasks must have descriptions!");
+          console.log(error);
+        }
       }
     };
     const delete_handler = (event) => {
@@ -439,14 +448,19 @@ class DOMController {
             this.switch_project(this.projects[0]);
           }
         } else if (type === "todo") {
-          const {details: todoDetails, id: todoID, row: todoNode} = this.getExpandedTodo();
+          const {
+            details: todoDetails,
+            id: todoID,
+            row: todoNode,
+          } = this.getExpandedTodo();
           todoDetails.remove();
           todoNode.remove();
           active_project.object.todos.splice(todoID, 1);
           // The switch_project method takes care of readjusting the indexing
           this.switch_project(active_project.object);
         } else if (type == "task") {
-          const {details: todoDetails, object: todoObject} = this.getExpandedTodo();
+          const { details: todoDetails, object: todoObject } =
+            this.getExpandedTodo();
           const taskNode = event.target.parentElement;
           const taskID = taskNode.querySelector("input").dataset.id;
           taskNode.remove();
