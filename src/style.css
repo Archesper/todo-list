@@ -304,6 +304,14 @@ dialog::backdrop {
   background-color: rgba(0, 0, 0, 0.5);
 }
 
+.grid_row :last-child {
+  text-transform: lowercase;
+}
+
+.grid_row :last-child::first-letter {
+  text-transform: uppercase;
+}
+
 .low {
   background-color: rgb(109, 221, 109);
 }

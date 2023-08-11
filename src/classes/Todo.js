@@ -5,10 +5,10 @@ export default Todo;
 class Todo {
   static PRIORITY_CONST() {
     return {
-      LOW: "Low",
-      MID: "Medium",
-      HIGH: "High",
-      URGENT: "Urgent",
+      LOW: "LOW",
+      MID: "MEDIUM",
+      HIGH: "HIGH",
+      URGENT: "URGENT",
     };
   }
   constructor(title, description, priority, dueDate) {

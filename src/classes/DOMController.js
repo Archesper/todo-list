@@ -322,8 +322,7 @@ class DOMController {
         elements["title"].value = todoToEdit.title;
         elements["description"].value = todoToEdit.description;
         elements["date"].valueAsNumber = todoToEdit.dueDate;
-        // TODO Change priority index ( PRIORITY_CONST object )
-        elements["priority"].value = todoToEdit.priority.toUpperCase();
+        elements["priority"].value = todoToEdit.priority;
         elements["index"].value = index;
       }
     };
@@ -404,7 +403,6 @@ class DOMController {
         task_label.classList.remove("checked");
       }
     };
-    // TODO: make clicking enter add the task, restyle input:focus
     const add_task = (event) => {
       if (event.keyCode === 13 || event.target.tagName === "BUTTON") {
         try {
