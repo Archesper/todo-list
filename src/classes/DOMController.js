@@ -14,18 +14,18 @@ class DOMController {
     this.main = document.querySelector("main");
     this.modal = document.querySelector("dialog");
   }
-  init_display() {
+  initDisplay() {
     // Add add project button event listener
-    const add_btn = this.nav.querySelector("button");
-    add_btn.addEventListener("click", this.eventListeners().newProject);
+    const addBtn = this.nav.querySelector("button");
+    addBtn.addEventListener("click", this.eventListeners().newProject);
     this.modal.addEventListener("click", this.eventListeners().dialogCloser);
     this.modal.addEventListener("close", this.eventListeners().formReset);
     this.modal
       .querySelector("form")
       .addEventListener("submit", this.eventListeners().todoFormSubmit);
     // Make project tabs
-    const project_list = document.createElement("ul");
-    this.nav.prepend(project_list);
+    const projectList = document.createElement("ul");
+    this.nav.prepend(projectList);
     this.projects.forEach((project, id) => this.addProject(project, id));
     // Display first project contents
     this.switchProject(this.projects[0]);
@@ -44,7 +44,7 @@ class DOMController {
     };
   }
   getExpandedTodo() {
-    const details = this.main.querySelector(".activeToggle");
+    const details = this.main.querySelector(".active_toggle");
     if (!details) {
       return undefined;
     }
@@ -60,9 +60,9 @@ class DOMController {
   }
   switchProject(project) {
     // Switch highlighted project in navbar
-    const current_project = this.getCurrentProject();
-    if (current_project) {
-      current_project.tab.classList.remove("active_project");
+    const currentProject = this.getCurrentProject();
+    if (currentProject) {
+      currentProject.tab.classList.remove("active_project");
     }
     const id = this.projects.indexOf(project);
     const newActiveProject = this.nav.querySelector(`[data-id="${id}"]`);
@@ -70,8 +70,8 @@ class DOMController {
     // Clear main contents
     this.main.textContent = "";
     // Add header to main
-    const icon_wrapper = document.createElement("div");
-    icon_wrapper.classList.add("icon_wrapper");
+    const iconWrapper = document.createElement("div");
+    iconWrapper.classList.add("icon_wrapper");
     const header = document.createElement("h2");
     header.textContent = project.name;
     header.addEventListener(
@@ -79,22 +79,22 @@ class DOMController {
       this.eventListeners().headerForceSubmit
     );
     header.addEventListener("blur", this.eventListeners().finishProjectEdit);
-    const edit_icon = this.editIconComponent("project");
-    const delete_icon = this.deleteIconComponent();
-    delete_icon.dataset.type = "project";
-    icon_wrapper.append(header, edit_icon, delete_icon);
-    this.main.append(icon_wrapper, this.addTodoBtn());
+    const editIcon = this.editIconComponent("project");
+    const deleteIcon = this.deleteIconComponent();
+    deleteIcon.dataset.type = "project";
+    iconWrapper.append(header, editIcon, deleteIcon);
+    this.main.append(iconWrapper, this.addTodoBtn());
     // Add grid of todos
     const grid = this.todosGrid(project);
     this.main.append(grid);
   }
   addProject(project, id) {
-    const project_list = this.nav.querySelector("ul");
+    const projectList = this.nav.querySelector("ul");
     const projectTab = document.createElement("li");
     projectTab.textContent = project.name;
     projectTab.dataset.id = id;
     projectTab.addEventListener("click", this.eventListeners().projectTab);
-    project_list.appendChild(projectTab);
+    projectList.appendChild(projectTab);
   }
   icons() {
     return {
@@ -105,51 +105,51 @@ class DOMController {
     };
   }
   editIconComponent(editable) {
-    const edit_icon = new Image();
-    edit_icon.src = edit_outline;
-    edit_icon.addEventListener("mouseover", (event) => {
+    const editIcon = new Image();
+    editIcon.src = edit_outline;
+    editIcon.addEventListener("mouseover", (event) => {
       this.eventListeners().iconHover(event, "edit");
     });
-    edit_icon.addEventListener("mouseout", (event) => {
+    editIcon.addEventListener("mouseout", (event) => {
       this.eventListeners().iconUnhover(event, "edit");
     });
     if (editable === "project") {
-      edit_icon.addEventListener(
+      editIcon.addEventListener(
         "click",
         this.eventListeners().beginProjectEdit
       );
     } else if (editable === "todo") {
-      edit_icon.addEventListener("click", (event) => {
-        const index = edit_icon.closest(".detail_toggle").dataset.id;
+      editIcon.addEventListener("click", (event) => {
+        const index = editIcon.closest(".detail_toggle").dataset.id;
         this.eventListeners().todoFormModal(event, index);
       });
     }
-    return edit_icon;
+    return editIcon;
   }
   deleteIconComponent() {
-    const delete_icon = new Image();
-    delete_icon.src = delete_outline;
-    delete_icon.addEventListener("mouseover", (event) => {
+    const deleteIcon = new Image();
+    deleteIcon.src = delete_outline;
+    deleteIcon.addEventListener("mouseover", (event) => {
       this.eventListeners().iconHover(event, "delete");
     });
-    delete_icon.addEventListener("mouseout", (event) => {
+    deleteIcon.addEventListener("mouseout", (event) => {
       this.eventListeners().iconUnhover(event, "delete");
     });
-    delete_icon.addEventListener("click", this.eventListeners().deleteHandler);
-    return delete_icon;
+    deleteIcon.addEventListener("click", this.eventListeners().deleteHandler);
+    return deleteIcon;
   }
   todosGrid(project) {
     const grid = document.createElement("div");
     grid.classList.add("todo_grid");
-    const header_text = ["Title", "Description", "Due date", "Priority"];
-    const header_row = document.createElement("div");
-    header_row.classList.add("grid_row", "grid_header");
-    header_text.forEach((text) => {
+    const headerText = ["Title", "Description", "Due date", "Priority"];
+    const headerRow = document.createElement("div");
+    headerRow.classList.add("grid_row", "grid_header");
+    headerText.forEach((text) => {
       const header = document.createElement("div");
       header.textContent = text;
-      header_row.appendChild(header);
+      headerRow.appendChild(header);
     });
-    grid.append(header_row);
+    grid.append(headerRow);
     project.todos.forEach((todo, index) => {
       const row = this.todoRowComponent(todo, index);
       const details = this.todoDetailsComponent(todo, index);
@@ -188,38 +188,38 @@ class DOMController {
   todoDetailsComponent(todo, index) {
     const details = document.createElement("div");
     details.classList.add("detail_toggle");
-    const description_header_wrapper = document.createElement("div");
-    description_header_wrapper.classList.add("description_header_wrapper");
-    const description_header = document.createElement("h3");
-    description_header.textContent = todo.title + ":";
-    const edit_icon = this.editIconComponent("todo");
-    const delete_icon = this.deleteIconComponent();
-    delete_icon.dataset.type = "todo";
-    description_header_wrapper.append(
-      description_header,
-      edit_icon,
-      delete_icon
+    const descriptionHeaderWrapper = document.createElement("div");
+    descriptionHeaderWrapper.classList.add("description_header_wrapper");
+    const descriptionHeader = document.createElement("h3");
+    descriptionHeader.textContent = todo.title + ":";
+    const editIcon = this.editIconComponent("todo");
+    const deleteIcon = this.deleteIconComponent();
+    deleteIcon.dataset.type = "todo";
+    descriptionHeaderWrapper.append(
+      descriptionHeader,
+      editIcon,
+      deleteIcon
     );
     const description = document.createElement("p");
     description.textContent = todo.description || "No description";
-    const task_header = document.createElement("h3");
+    const taskHeader = document.createElement("h3");
 
-    task_header.textContent = "Tasks:";
+    taskHeader.textContent = "Tasks:";
 
     const tasks = todo.tasks;
     const taskNodes = tasks.map((task, index) => {
       return this.taskNodeComponent(task, index);
     });
-    const new_task_wrapper = this.taskInputComponent();
-    const nested_div = document.createElement("div");
-    nested_div.append(
-      description_header_wrapper,
+    const newTaskWrapper = this.taskInputComponent();
+    const nestedDiv = document.createElement("div");
+    nestedDiv.append(
+      descriptionHeaderWrapper,
       description,
-      task_header,
-      new_task_wrapper,
+      taskHeader,
+      newTaskWrapper,
       ...taskNodes
     );
-    details.appendChild(nested_div);
+    details.appendChild(nestedDiv);
     details.dataset.id = index;
     return details;
   }
@@ -227,8 +227,8 @@ class DOMController {
     const taskNode = document.createElement("div");
     const check = document.createElement("input");
     const label = document.createElement("label");
-    const delete_icon = this.deleteIconComponent();
-    delete_icon.dataset.type = "task";
+    const deleteIcon = this.deleteIconComponent();
+    deleteIcon.dataset.type = "task";
     check.type = "checkbox";
     label.textContent = task.description;
     // Whitespaces are removed because CSS IDs cannot have whitespaces
@@ -242,29 +242,29 @@ class DOMController {
     if (task.done) {
       label.classList.add("checked");
     }
-    taskNode.append(check, label, delete_icon);
+    taskNode.append(check, label, deleteIcon);
     taskNode.classList.add("task_wrapper");
     return taskNode;
   }
   addTodoBtn() {
-    const add_btn = document.createElement("button");
-    add_btn.textContent = "+ Add Todo";
-    add_btn.classList.add("todo_btn");
-    add_btn.addEventListener("click", this.eventListeners().todoFormModal);
-    return add_btn;
+    const addBtn = document.createElement("button");
+    addBtn.textContent = "+ Add Todo";
+    addBtn.classList.add("todo_btn");
+    addBtn.addEventListener("click", this.eventListeners().todoFormModal);
+    return addBtn;
   }
   taskInputComponent() {
-    const add_btn = document.createElement("button");
-    add_btn.textContent = "+ Add Task";
-    add_btn.classList.add("task_btn");
-    add_btn.addEventListener("click", this.eventListeners().addTask);
+    const addBtn = document.createElement("button");
+    addBtn.textContent = "+ Add Task";
+    addBtn.classList.add("task_btn");
+    addBtn.addEventListener("click", this.eventListeners().addTask);
     const taskInput = document.createElement("input");
     taskInput.placeholder = "Add new task...";
     taskInput.addEventListener("keydown", this.eventListeners().addTask);
-    const new_taskInput_wrapper = document.createElement("div");
-    new_taskInput_wrapper.append(taskInput, add_btn);
-    new_taskInput_wrapper.classList.add("taskInput_wrapper");
-    return new_taskInput_wrapper;
+    const newTaskInputWrapper = document.createElement("div");
+    newTaskInputWrapper.append(taskInput, addBtn);
+    newTaskInputWrapper.classList.add("task_input_wrapper");
+    return newTaskInputWrapper;
   }
   eventListeners() {
     const projectTab = (event) => {
@@ -320,7 +320,7 @@ class DOMController {
         const elements = form.elements;
         const todoToEdit = this.getExpandedTodo().object;
         elements["title"].value = todoToEdit.title;
-        elements["description"].value = todoToEdit.description;
+        elements["description"].value = todoToEdit.description || "";
         elements["date"].valueAsNumber = todoToEdit.dueDate;
         elements["priority"].value = todoToEdit.priority;
         elements["index"].value = index;
@@ -328,12 +328,12 @@ class DOMController {
     };
     const todoFormSubmit = (event) => {
       event.preventDefault();
-      const form_elements = event.target.elements;
-      const title = form_elements["title"].value || undefined;
-      const description = form_elements["description"].value || undefined;
-      const dueDate = form_elements["date"].valueAsNumber;
-      const priority = form_elements["priority"].value;
-      const index = form_elements["index"].value;
+      const formElements = event.target.elements;
+      const title = formElements["title"].value || undefined;
+      const description = formElements["description"].value || undefined;
+      const dueDate = formElements["date"].valueAsNumber;
+      const priority = formElements["priority"].value;
+      const index = formElements["index"].value;
       try {
         const newTodo = new Todo(title, description, priority, dueDate);
         const activeProjectObject = this.getCurrentProject().object;
@@ -409,7 +409,7 @@ class DOMController {
           const { details: activeToggle, object: todoObject } =
             this.getExpandedTodo();
           const taskInput = activeToggle
-            .querySelector(".taskInput_wrapper")
+            .querySelector(".task_input_wrapper")
             .querySelector("input");
           const newTask = new Task(taskInput.value);
           const index = todoObject.tasks.length;
