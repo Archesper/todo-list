@@ -312,19 +312,19 @@ dialog::backdrop {
   text-transform: uppercase;
 }
 
-.low {
+.LOW {
   background-color: rgb(109, 221, 109);
 }
 
-.medium {
+.MEDIUM {
   background-color: #fdff76;
 }
 
-.high {
+.HIGH {
   background-color: #ff7c7a;
 }
 
-.urgent {
+.URGENT {
   color: white;
   background-color: rgb(255, 0, 0);
 }

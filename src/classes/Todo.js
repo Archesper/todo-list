@@ -6,7 +6,7 @@ class Todo {
   static PRIORITY_CONST() {
     return {
       LOW: "LOW",
-      MID: "MEDIUM",
+      MEDIUM: "MEDIUM",
       HIGH: "HIGH",
       URGENT: "URGENT",
     };

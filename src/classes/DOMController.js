@@ -175,7 +175,7 @@ class DOMController {
     ];
     const row = document.createElement("div");
     row.classList.add("grid_row");
-    row.classList.add(todo.priority.toLowerCase());
+    row.classList.add(todo.priority);
     contents.forEach((content) => {
       const node = document.createElement("div");
       node.textContent = content;
@@ -319,6 +319,7 @@ class DOMController {
         const form = this.modal.querySelector("form");
         const elements = form.elements;
         const todoToEdit = this.getExpandedTodo().object;
+        console.log(todoToEdit.priority);
         elements["title"].value = todoToEdit.title;
         elements["description"].value = todoToEdit.description || "";
         elements["date"].valueAsNumber = todoToEdit.dueDate;
@@ -334,6 +335,7 @@ class DOMController {
       const dueDate = formElements["date"].valueAsNumber;
       const priority = formElements["priority"].value;
       const index = formElements["index"].value;
+      console.log(priority);
       try {
         const newTodo = new Todo(title, description, priority, dueDate);
         const activeProjectObject = this.getCurrentProject().object;
