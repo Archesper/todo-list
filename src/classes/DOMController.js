@@ -2,6 +2,7 @@ export default DOMController;
 import Project from "./Project";
 import Todo from "./Todo";
 import Task from "./Task";
+import LocalStorageSaver from "./LocalStorageSaver";
 import edit_outline from "../assets/edit_outline.svg";
 import edit_filled from "../assets/edit_filled.svg";
 import delete_outline from "../assets/delete_outline.svg";
@@ -13,6 +14,7 @@ class DOMController {
     this.nav = document.getElementById("projects");
     this.main = document.querySelector("main");
     this.modal = document.querySelector("dialog");
+    this.storageSaver = new LocalStorageSaver();
   }
   initDisplay() {
     // Add add project button event listener
@@ -29,6 +31,8 @@ class DOMController {
     this.projects.forEach((project, id) => this.addProject(project, id));
     // Display first project contents
     this.switchProject(this.projects[0]);
+    this.storageSaver.saveObject(this.projects, "projects");
+    this.storageSaver.saveObject(this.projects.length, "projectCount");
   }
   getCurrentProject() {
     const tab = this.nav.querySelector(".active_project");
@@ -74,10 +78,7 @@ class DOMController {
     iconWrapper.classList.add("icon_wrapper");
     const header = document.createElement("h2");
     header.textContent = project.name;
-    header.addEventListener(
-      "keydown",
-      this.eventListeners().headerForceSubmit
-    );
+    header.addEventListener("keydown", this.eventListeners().headerForceSubmit);
     header.addEventListener("blur", this.eventListeners().finishProjectEdit);
     const editIcon = this.editIconComponent("project");
     const deleteIcon = this.deleteIconComponent();
@@ -95,6 +96,7 @@ class DOMController {
     projectTab.dataset.id = id;
     projectTab.addEventListener("click", this.eventListeners().projectTab);
     projectList.appendChild(projectTab);
+    this.storageSaver.saveNestedObject("projects", project, id);
   }
   icons() {
     return {
@@ -195,11 +197,7 @@ class DOMController {
     const editIcon = this.editIconComponent("todo");
     const deleteIcon = this.deleteIconComponent();
     deleteIcon.dataset.type = "todo";
-    descriptionHeaderWrapper.append(
-      descriptionHeader,
-      editIcon,
-      deleteIcon
-    );
+    descriptionHeaderWrapper.append(descriptionHeader, editIcon, deleteIcon);
     const description = document.createElement("p");
     description.textContent = todo.description || "No description";
     const taskHeader = document.createElement("h3");
@@ -273,7 +271,10 @@ class DOMController {
     };
     const newProject = (event) => {
       const id = this.projects.length;
-      const project = new Project(`Project ${id + 1}`);
+      let projectCount = this.storageSaver.getObject("projectCount");
+      projectCount += 1;
+      this.storageSaver.saveObject(projectCount, "projectCount");
+      const project = new Project(`Project ${projectCount}`);
       this.projects.push(project);
       this.addProject(project, id);
       this.switchProject(project);
@@ -292,12 +293,20 @@ class DOMController {
       activeProjectHeader.focus();
     };
     const finishProjectEdit = (event) => {
-      const { tab: projectTab, object: projectObject } =
-        this.getCurrentProject();
+      const {
+        tab: projectTab,
+        object: projectObject,
+        id: projectID,
+      } = this.getCurrentProject();
       const newName = event.target.textContent;
       try {
         projectObject.name = newName;
         projectTab.textContent = newName;
+        this.storageSaver.saveNestedObject(
+          "projects",
+          projectObject,
+          projectID
+        );
       } catch (error) {
         alert("Project titles cannot exceed 75 characters");
         event.target.textContent = projectObject.name;
@@ -352,6 +361,11 @@ class DOMController {
           updatedTodoDetails.replaceWith(
             this.todoDetailsComponent(newTodo, index)
           );
+          this.storageSaver.saveNestedObject("projects", newTodo, [
+            this.getCurrentProject().id,
+            "todos",
+            index,
+          ]);
         } else {
           const index = activeProjectObject.todos.length;
           activeProjectObject.append_todo(newTodo);
@@ -359,6 +373,10 @@ class DOMController {
             this.todoRowComponent(newTodo, index),
             this.todoDetailsComponent(newTodo, index)
           );
+          this.storageSaver.saveNestedObject("projects", newTodo, [
+            this.getCurrentProject().id,
+            "todos",
+          ]);
         }
         event.target.reset();
         this.modal.close();
@@ -399,6 +417,13 @@ class DOMController {
       const done = event.target.checked;
       const taskLabel = event.target.nextSibling;
       correspondingTask.done = done;
+      this.storageSaver.saveNestedObject("projects", correspondingTask, [
+        this.getCurrentProject().id,
+        "todos",
+        this.getExpandedTodo().id,
+        "tasks",
+        taskID,
+      ]);
       if (done) {
         taskLabel.classList.add("checked");
       } else {
@@ -408,8 +433,11 @@ class DOMController {
     const addTask = (event) => {
       if (event.keyCode === 13 || event.target.tagName === "BUTTON") {
         try {
-          const { details: activeToggle, object: todoObject } =
-            this.getExpandedTodo();
+          const {
+            details: activeToggle,
+            object: todoObject,
+            id: todoID,
+          } = this.getExpandedTodo();
           const taskInput = activeToggle
             .querySelector(".task_input_wrapper")
             .querySelector("input");
@@ -419,6 +447,12 @@ class DOMController {
             this.taskNodeComponent(newTask, index)
           );
           todoObject.append_task(newTask);
+          this.storageSaver.saveNestedObject("projects", newTask, [
+            this.getCurrentProject().id,
+            "todos",
+            todoID,
+            "tasks",
+          ]);
           taskInput.value = "";
         } catch (error) {
           alert("Tasks must have descriptions!");
@@ -445,6 +479,9 @@ class DOMController {
                 project.dataset.id -= 1;
               });
             this.projects.splice(activeProject.id, 1);
+            this.storageSaver.removeNestedObject("projects", [
+              activeProject.id,
+            ]);
             this.switchProject(this.projects[0]);
           }
         } else if (type === "todo") {
@@ -456,14 +493,29 @@ class DOMController {
           todoDetails.remove();
           todoNode.remove();
           activeProject.object.todos.splice(todoID, 1);
+          this.storageSaver.removeNestedObject("projects", [
+            activeProject.id,
+            "todos",
+            todoID,
+          ]);
           // The switchProject method takes care of readjusting the indexing
           this.switchProject(activeProject.object);
         } else if (type == "task") {
-          const { details: todoDetails, object: todoObject } =
-            this.getExpandedTodo();
+          const {
+            details: todoDetails,
+            object: todoObject,
+            id: todoID,
+          } = this.getExpandedTodo();
           const taskNode = event.target.parentElement;
           const taskID = taskNode.querySelector("input").dataset.id;
           taskNode.remove();
+          this.storageSaver.removeNestedObject("projects", [
+            activeProject.id,
+            "todos",
+            todoID,
+            "tasks",
+            taskID,
+          ]);
           todoObject.tasks.splice(taskID, 1);
           const taskInputs = todoDetails.querySelectorAll(
             "input[type='checkbox']"
