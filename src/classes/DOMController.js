@@ -23,7 +23,6 @@ class DOMController {
       this.storageSaver.saveObject(this.projects, "projects");
       this.storageSaver.saveObject(this.projects.length, "projectCount");
     }
-    console.log(this.projects);
     // Add add project button event listener
     const addBtn = this.nav.querySelector("button");
     addBtn.addEventListener("click", this.eventListeners().newProject);
@@ -358,7 +357,6 @@ class DOMController {
         const todoToEdit = this.getExpandedTodo().object;
         elements["title"].value = todoToEdit.title;
         elements["description"].value = todoToEdit.description || "";
-        console.log(todoToEdit.dueDate);
         elements["date"].valueAsNumber = todoToEdit.dueDate;
         elements["priority"].value = todoToEdit.priority;
         elements["index"].value = index;

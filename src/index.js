@@ -1,7 +1,5 @@
 import "reset-css";
 import "./style.css";
-import Task from "./classes/Task.js";
-import Todo from "./classes/Todo.js";
 import Project from "./classes/Project.js";
 import DOMController from "./classes/DOMController";
 

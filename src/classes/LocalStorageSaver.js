@@ -20,12 +20,8 @@ class LocalStorageSaver {
   removeNestedObject(parentKey, keys) {
     const parent = localStorage.getItem(parentKey);
     const parentObject = JSON.parse(parent);
-    console.log(parent);
-    console.log(parentObject);
     const nestedPropertyParent = this.getNestedObject(parentObject, keys.slice(0, -1));
-    console.log(nestedPropertyParent);
     const [id] = [keys.slice(-1)];
-    console.log(id);
     nestedPropertyParent.splice(id, 1);
     localStorage.setItem(parentKey, JSON.stringify(parentObject));
   }
