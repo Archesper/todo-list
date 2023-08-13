@@ -17,6 +17,13 @@ class DOMController {
     this.storageSaver = new LocalStorageSaver();
   }
   initDisplay() {
+    if (localStorage.length) {
+      this.loadLocalStorage();
+    } else {
+      this.storageSaver.saveObject(this.projects, "projects");
+      this.storageSaver.saveObject(this.projects.length, "projectCount");
+    }
+    console.log(this.projects);
     // Add add project button event listener
     const addBtn = this.nav.querySelector("button");
     addBtn.addEventListener("click", this.eventListeners().newProject);
@@ -31,8 +38,27 @@ class DOMController {
     this.projects.forEach((project, id) => this.addProject(project, id));
     // Display first project contents
     this.switchProject(this.projects[0]);
-    this.storageSaver.saveObject(this.projects, "projects");
-    this.storageSaver.saveObject(this.projects.length, "projectCount");
+  }
+  loadLocalStorage() {
+    this.projects = this.storageSaver.getObject("projects");
+    this.projects.forEach((project, index) => {
+      const projectObject = new Project(project._name);
+      // Copy todos into new object
+      projectObject.todos = project.todos;
+      projectObject.todos.forEach((todo, index) => {
+        const {_title: title, _priority: priority, _dueDate: dueDate, _description: description} = todo;
+        const todoObject = new Todo(title, description, priority, dueDate);
+        // Copy tasks into new object
+        todoObject.tasks = todo.tasks;
+        todoObject.tasks.forEach((task, index) => {
+          const {_description: description, _done: done} = task;
+          const taskObject = new Task(description, done);
+          todoObject.tasks[index] = taskObject;
+        })
+        projectObject.todos[index] = todoObject;
+      })
+      this.projects[index] = projectObject;
+    })
   }
   getCurrentProject() {
     const tab = this.nav.querySelector(".active_project");
@@ -96,7 +122,6 @@ class DOMController {
     projectTab.dataset.id = id;
     projectTab.addEventListener("click", this.eventListeners().projectTab);
     projectList.appendChild(projectTab);
-    this.storageSaver.saveNestedObject("projects", project, id);
   }
   icons() {
     return {
@@ -276,6 +301,7 @@ class DOMController {
       this.storageSaver.saveObject(projectCount, "projectCount");
       const project = new Project(`Project ${projectCount}`);
       this.projects.push(project);
+      this.storageSaver.saveNestedObject("projects", project, id);
       this.addProject(project, id);
       this.switchProject(project);
     };
@@ -328,7 +354,6 @@ class DOMController {
         const form = this.modal.querySelector("form");
         const elements = form.elements;
         const todoToEdit = this.getExpandedTodo().object;
-        console.log(todoToEdit.priority);
         elements["title"].value = todoToEdit.title;
         elements["description"].value = todoToEdit.description || "";
         elements["date"].valueAsNumber = todoToEdit.dueDate;
@@ -344,7 +369,6 @@ class DOMController {
       const dueDate = formElements["date"].valueAsNumber;
       const priority = formElements["priority"].value;
       const index = formElements["index"].value;
-      console.log(priority);
       try {
         const newTodo = new Todo(title, description, priority, dueDate);
         const activeProjectObject = this.getCurrentProject().object;
@@ -381,7 +405,6 @@ class DOMController {
         event.target.reset();
         this.modal.close();
       } catch (error) {
-        console.log(error);
         if (error instanceof RangeError) {
           alert("Todo titles cannot exceed 75 characters");
         } else if (error instanceof TypeError) {
@@ -456,7 +479,6 @@ class DOMController {
           taskInput.value = "";
         } catch (error) {
           alert("Tasks must have descriptions!");
-          console.log(error);
         }
       }
     };
