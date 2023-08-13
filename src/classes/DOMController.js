@@ -186,7 +186,9 @@ class DOMController {
   }
   todoRowComponent(todo, index) {
     let formattedDate;
-    if (todo.dueDate) {
+    // The second condition treats edge case where dueDate is the unix 0 - 01/01/1970, to prevent display from showing None
+    // when there technically is a dueDate.
+    if (todo.dueDate || todo.dueDate === 0) {
       const dateObject = new Date(todo.dueDate);
       formattedDate = `${
         dateObject.getMonth() + 1
@@ -356,6 +358,7 @@ class DOMController {
         const todoToEdit = this.getExpandedTodo().object;
         elements["title"].value = todoToEdit.title;
         elements["description"].value = todoToEdit.description || "";
+        console.log(todoToEdit.dueDate);
         elements["date"].valueAsNumber = todoToEdit.dueDate;
         elements["priority"].value = todoToEdit.priority;
         elements["index"].value = index;
@@ -366,7 +369,9 @@ class DOMController {
       const formElements = event.target.elements;
       const title = formElements["title"].value || undefined;
       const description = formElements["description"].value || undefined;
-      const dueDate = formElements["date"].valueAsNumber;
+      let dueDate = formElements["date"].valueAsNumber;
+      // Treats edge case where the dueDate is the unix 0 - 01/01/1970
+      dueDate = dueDate === 0 ? dueDate : (dueDate || undefined);
       const priority = formElements["priority"].value;
       const index = formElements["index"].value;
       try {
